@@ -1,8 +1,8 @@
-##  Скачать последнюю версию
+## 📥 Скачать последнюю версию
 
-👉 **[Скачать BotLauncher v1.0](https://github.com/GAMNYAR/BotLauncher/releases/tag/v1.0)**
+👉 **[Скачать установщик BotLauncher v1.0](https://github.com/GAMNYAR/BotLauncher/releases/download/v1.0/BotLauncher_Setup.exe)**
 
----
+Просто запустите установщик и следуйте инструкциям!
 
 # 🪰 BotLauncher
 
