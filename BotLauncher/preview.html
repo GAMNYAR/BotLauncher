@@ -1,0 +1,702 @@
+﻿<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Предпросмотр</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-primary: #0e1621;
+            --bg-secondary: #17212b;
+            --bg-bubble: #182533;
+            --bg-input: #242f3d;
+            --text-primary: #ffffff;
+            --text-secondary: #6c7883;
+            --accent: #5aaeff;
+            --border: #0e1621;
+        }
+
+        body.light-theme {
+            --bg-primary: #e0e0e0;
+            --bg-secondary: #ffffff;
+            --bg-bubble: #ffffff;
+            --bg-input: #f0f2f5;
+            --text-primary: #000000;
+            --text-secondary: #707579;
+            --accent: #2481cc;
+            --border: #d1d7db;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            position: relative; /* Для корректного позиционирования лоадера */
+        }
+
+        /* ===== LOADER STYLES ===== */
+        .loader-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: var(--bg-primary);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            transition: opacity 0.4s ease, visibility 0.4s ease;
+        }
+
+            .loader-container.hidden {
+                opacity: 0;
+                visibility: hidden;
+                pointer-events: none;
+            }
+
+        .spinner {
+            width: 48px;
+            height: 48px;
+            border: 4px solid var(--bg-secondary);
+            border-top-color: var(--accent);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin-bottom: 16px;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .loader-text {
+            color: var(--text-secondary);
+            font-size: 14px;
+            font-weight: 500;
+        }
+        /* =========================== */
+
+        /* SVG Icons Styling */
+        .icon-svg {
+            width: 20px;
+            height: 20px;
+            fill: currentColor;
+            display: block;
+        }
+
+        .icon-svg-small {
+            width: 16px;
+            height: 16px;
+            fill: currentColor;
+            display: block;
+        }
+
+        .icon-svg-play {
+            width: 24px;
+            height: 24px;
+            fill: white;
+            display: block;
+            margin-left: 2px;
+        }
+
+        /* HEADER */
+        .app-header {
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border);
+            padding: 10px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: 52px;
+            flex-shrink: 0;
+        }
+
+        .header-title {
+            font-size: 15px;
+            font-weight: 600;
+        }
+
+        .header-controls {
+            display: flex;
+            gap: 8px;
+        }
+
+        .icon-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-secondary);
+            transition: all 0.2s;
+        }
+
+            .icon-btn:hover {
+                background: rgba(128, 128, 128, 0.2);
+                color: var(--text-primary);
+            }
+
+        /* CHAT AREA */
+        .chat-area {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+            .chat-area::-webkit-scrollbar {
+                width: 8px;
+            }
+
+            .chat-area::-webkit-scrollbar-track {
+                background: transparent;
+            }
+
+            .chat-area::-webkit-scrollbar-thumb {
+                background: var(--text-secondary);
+                border-radius: 4px;
+                opacity: 0.3;
+            }
+
+        /* DATE BADGE */
+        .date-badge {
+            background: var(--bg-secondary);
+            color: var(--text-secondary);
+            padding: 6px 14px;
+            border-radius: 16px;
+            font-size: 13px;
+            font-weight: 500;
+            margin-bottom: 16px;
+        }
+
+        /* MESSAGE WRAPPER */
+        .message-wrapper {
+            display: flex;
+            align-items: flex-end;
+            gap: 12px;
+            max-width: 620px;
+            width: 100%;
+        }
+
+            .message-wrapper.mobile {
+                max-width: 380px;
+            }
+
+        /* CHANNEL AVATAR */
+        .channel-avatar {
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            overflow: hidden;
+            flex-shrink: 0;
+        }
+
+            .channel-avatar img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+            }
+
+        /* MESSAGE BUBBLE */
+        .message-bubble {
+            background: var(--bg-bubble);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+            flex: 1;
+        }
+
+        /* BUBBLE HEADER */
+        .bubble-header {
+            padding: 12px 16px 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .channel-name {
+            color: var(--accent);
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .channel-type {
+            color: var(--text-secondary);
+            font-size: 13px;
+        }
+
+        /* ===== УМНАЯ СЕТКА ВЛОЖЕНИЙ ===== */
+        .attachments {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            overflow: hidden;
+        }
+
+        .attachment-group {
+            display: grid;
+            gap: 2px;
+            overflow: hidden;
+        }
+
+        /* 1 файл - на всю ширину */
+        .group-1 {
+            grid-template-columns: 1fr;
+        }
+
+            .group-1 .att-item {
+                aspect-ratio: 4/3;
+            }
+
+        /* 2 файла - 2 колонки */
+        .group-2 {
+            grid-template-columns: 1fr 1fr;
+        }
+
+            .group-2 .att-item {
+                aspect-ratio: 1/1;
+            }
+
+        /* 3 файла - 3 колонки */
+        .group-3 {
+            grid-template-columns: 1fr 1fr 1fr;
+        }
+
+            .group-3 .att-item {
+                aspect-ratio: 1/1;
+            }
+
+        /* 4 файла - 2x2 */
+        .group-4 {
+            grid-template-columns: 1fr 1fr;
+            grid-template-rows: 1fr 1fr;
+        }
+
+            .group-4 .att-item {
+                aspect-ratio: 1/1;
+            }
+
+        /* 5 файлов - 3+2 */
+        .group-5 {
+            grid-template-columns: 1fr 1fr 1fr;
+            grid-template-rows: 1fr 1fr;
+        }
+
+            .group-5 .att-item {
+                aspect-ratio: 1/1;
+            }
+
+        /* 6 файлов - 2x3 */
+        .group-6 {
+            grid-template-columns: 1fr 1fr;
+            grid-template-rows: 1fr 1fr 1fr;
+        }
+
+            .group-6 .att-item {
+                aspect-ratio: 1/1;
+            }
+
+        /* 7 файлов - 4+3 */
+        .group-7 {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+            .group-7 .row-top {
+                display: grid;
+                grid-template-columns: 1fr 1fr 1fr 1fr;
+                gap: 2px;
+            }
+
+                .group-7 .row-top .att-item {
+                    aspect-ratio: 1/1;
+                }
+
+            .group-7 .row-bottom {
+                display: grid;
+                grid-template-columns: 1fr 1fr 1fr;
+                gap: 2px;
+            }
+
+                .group-7 .row-bottom .att-item {
+                    aspect-ratio: 1/1;
+                }
+
+        /* 8 файлов - 4+4 */
+        .group-8 {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+            .group-8 .row {
+                display: grid;
+                grid-template-columns: 1fr 1fr 1fr 1fr;
+                gap: 2px;
+            }
+
+                .group-8 .row .att-item {
+                    aspect-ratio: 1/1;
+                }
+
+        /* 9 файлов - 3x3 */
+        .group-9 {
+            grid-template-columns: 1fr 1fr 1fr;
+            grid-template-rows: 1fr 1fr 1fr;
+        }
+
+            .group-9 .att-item {
+                aspect-ratio: 1/1;
+            }
+
+        /* 10 файлов - 3+3+4 или 4+3+3 */
+        .group-10 {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+            .group-10 .row {
+                display: grid;
+                grid-template-columns: 1fr 1fr 1fr 1fr;
+                gap: 2px;
+            }
+
+                .group-10 .row .att-item {
+                    aspect-ratio: 1/1;
+                }
+
+        /* 11 файлов - 4+4+3 */
+        .group-11 {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+            .group-11 .row {
+                display: grid;
+                grid-template-columns: 1fr 1fr 1fr 1fr;
+                gap: 2px;
+            }
+
+                .group-11 .row .att-item {
+                    aspect-ratio: 1/1;
+                }
+
+        /* 12 файлов - 4+4+4 или 3x4 */
+        .group-12 {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+            .group-12 .row {
+                display: grid;
+                grid-template-columns: 1fr 1fr 1fr 1fr;
+                gap: 2px;
+            }
+
+                .group-12 .row .att-item {
+                    aspect-ratio: 1/1;
+                }
+
+        /* 13+ файлов - сетка с прокруткой */
+        .group-many {
+            grid-template-columns: 1fr 1fr 1fr;
+            grid-auto-rows: 1fr;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+            .group-many .att-item {
+                aspect-ratio: 1/1;
+            }
+
+        .att-item {
+            position: relative;
+            overflow: hidden;
+            background: #1f232a;
+        }
+
+            .att-item img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+                display: block;
+            }
+
+        .play-icon {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.7);
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* MESSAGE TEXT */
+        .message-text {
+            padding: 12px 16px;
+            line-height: 1.5;
+            font-size: 15px;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+        /* BUBBLE FOOTER */
+        .bubble-footer {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            padding: 0 16px 12px;
+            gap: 8px;
+        }
+
+        .views {
+            color: var(--text-secondary);
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .pinned-icon {
+            color: var(--accent);
+            display: none;
+        }
+
+            .pinned-icon.visible {
+                display: flex;
+                align-items: center;
+            }
+
+        .time {
+            color: var(--text-secondary);
+            font-size: 13px;
+        }
+
+        /* INPUT AREA */
+        .input-area {
+            background: var(--bg-secondary);
+            border-top: 1px solid var(--border);
+            padding: 12px 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-shrink: 0;
+        }
+
+        .input-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: transparent;
+            border: none;
+            cursor: default;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-secondary);
+            transition: color 0.2s;
+        }
+
+            .input-icon:hover {
+                color: var(--accent);
+            }
+
+        .input-field {
+            flex: 1;
+            background: var(--bg-input);
+            border: none;
+            border-radius: 20px;
+            padding: 12px 20px;
+            color: var(--text-primary);
+            font-size: 15px;
+            outline: none;
+            font-family: inherit;
+            cursor: default;
+        }
+
+            .input-field::placeholder {
+                color: var(--text-secondary);
+            }
+
+        /* TEXT FORMATTING */
+        b, strong {
+            font-weight: bold;
+        }
+
+        i, em {
+            font-style: italic;
+        }
+
+        code {
+            font-family: 'Consolas', monospace;
+            background: var(--bg-input);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 13px;
+            color: #c8c8c8;
+        }
+
+        pre {
+            font-family: 'Consolas', monospace;
+            background: var(--bg-input);
+            padding: 10px;
+            border-radius: 6px;
+            margin: 8px 0;
+            overflow-x: auto;
+            font-size: 13px;
+            color: #b4b4b4;
+        }
+    </style>
+</head>
+<body>
+    <!-- LOADER -->
+    <div id="loader" class="loader-container">
+        <div class="spinner"></div>
+        <div class="loader-text">Загрузка предпросмотра...</div>
+    </div>
+
+    <!-- HEADER -->
+    <div class="app-header">
+        <div class="header-title">Предпросмотр</div>
+        <div class="header-controls">
+            <button class="icon-btn" id="themeBtn" title="Сменить тему">
+                <svg class="icon-svg" viewBox="0 0 24 24"><path d="M12 3c-4.97 0-9 4.03-9 9s4.03 9 9 9 9-4.03 9-9c0-.46-.04-.92-.1-1.36-.98 1.37-2.58 2.26-4.4 2.26-3.03 0-5.5-2.47-5.5-5.5 0-1.82.89-3.42 2.26-4.4-.44-.06-.9-.1-1.36-.1z" /></svg>
+            </button>
+            <button class="icon-btn" id="viewBtn" title="Сменить вид">
+                <svg class="icon-svg" viewBox="0 0 24 24"><path d="M17 1.01L7 1c-1.1 0-2 .9-2 2v18c0 1.1.9 2 2 2h10c1.1 0 2-.9 2-2V3c0-1.1-.9-1.99-2-1.99zM17 19H7V5h10v14z" /></svg>
+            </button>
+        </div>
+    </div>
+
+    <!-- CHAT AREA -->
+    <div class="chat-area">
+        <div class="date-badge" id="dateBadge">Сегодня</div>
+
+        <div class="message-wrapper" id="messageWrapper">
+            <div class="channel-avatar">
+                <img src="https://cdn-icons-png.flaticon.com/512/4712/4712035.png" alt="Bot">
+            </div>
+            <div class="message-bubble">
+                <div class="bubble-header">
+                    <span class="channel-name" id="channelName">Бот</span>
+                    <span class="channel-type" id="channelType">канал</span>
+                </div>
+                <div class="attachments" id="attachmentsContainer"></div>
+                <div class="message-text" id="messageText"></div>
+                <div class="bubble-footer">
+                    <span class="views">
+                        <svg class="icon-svg-small" viewBox="0 0 24 24"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z" /></svg>
+                        <span id="viewsCount">17</span>
+                    </span>
+                    <span class="pinned-icon" id="pinnedIcon">
+                        <svg class="icon-svg-small" viewBox="0 0 24 24"><path d="M16 12V4h1V2H7v2h1v8l-2 2v2h5.2v6h1.6v-6H18v-2l-2-2z" /></svg>
+                    </span>
+                    <span class="time" id="messageTime">14:28</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- INPUT AREA -->
+    <div class="input-area">
+        <div class="input-icon" title="Прикрепить">
+            <svg class="icon-svg" viewBox="0 0 24 24"><path d="M16.5 6v11.5c0 2.21-1.79 4-4 4s-4-1.79-4-4V5c0-1.38 1.12-2.5 2.5-2.5s2.5 1.12 2.5 2.5v10.5c0 .55-.45 1-1 1s-1-.45-1-1V6H10v9.5c0 1.38 1.12 2.5 2.5 2.5s2.5-1.12 2.5-2.5V5c0-2.21-1.79-4-4-4S7 2.79 7 5v12.5c0 3.04 2.46 5.5 5.5 5.5s5.5-2.46 5.5-5.5V6h-1.5z" /></svg>
+        </div>
+        <input class="input-field" placeholder="Написать сообщение..." readonly>
+        <div class="input-icon" title="Эмодзи">
+            <svg class="icon-svg" viewBox="0 0 24 24"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm3.5-9c.83 0 1.5-.67 1.5-1.5S16.33 8 15.5 8 14 8.67 14 9.5s.67 1.5 1.5 1.5zm-7 0c.83 0 1.5-.67 1.5-1.5S9.33 8 8.5 8 7 8.67 7 9.5 7.67 11 8.5 11zm3.5 6.5c2.33 0 4.31-1.46 5.11-3.5H6.89c.8 2.04 2.78 3.5 5.11 3.5z" /></svg>
+        </div>
+        <div class="input-icon" title="Микрофон">
+            <svg class="icon-svg" viewBox="0 0 24 24"><path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3z" /><path d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z" /></svg>
+        </div>
+    </div>
+
+    <script>
+        // SVG иконки для кнопок
+        const icons = {
+            moon: '<svg class="icon-svg" viewBox="0 0 24 24"><path d="M12 3c-4.97 0-9 4.03-9 9s4.03 9 9 9 9-4.03 9-9c0-.46-.04-.92-.1-1.36-.98 1.37-2.58 2.26-4.4 2.26-3.03 0-5.5-2.47-5.5-5.5 0-1.82.89-3.42 2.26-4.4-.44-.06-.9-.1-1.36-.1z"/></svg>',
+            sun: '<svg class="icon-svg" viewBox="0 0 24 24"><path d="M12 7c-2.76 0-5 2.24-5 5s2.24 5 5 5 5-2.24 5-5-2.24-5-5-5zM2 13h2c.55 0 1-.45 1-1s-.45-1-1-1H2c-.55 0-1 .45-1 1s.45 1 1 1zm18 0h2c.55 0 1-.45 1-1s-.45-1-1-1h-2c-.55 0-1 .45-1 1s.45 1 1 1zM11 2v2c0 .55.45 1 1 1s1-.45 1-1V2c0-.55-.45-1-1-1s-1 .45-1 1zm0 18v2c0 .55.45 1 1 1s1-.45 1-1v-2c0-.55-.45-1-1-1s-1 .45-1 1zM5.99 4.58a.996.996 0 00-1.41 0 .996.996 0 000 1.41l1.06 1.06c.39.39 1.03.39 1.41 0s.39-1.03 0-1.41L5.99 4.58zm12.37 12.37a.996.996 0 00-1.41 0 .996.996 0 000 1.41l1.06 1.06c.39.39 1.03.39 1.41 0a.996.996 0 000-1.41l-1.06-1.06zm1.06-10.96a.996.996 0 000-1.41.996.996 0 00-1.41 0l-1.06 1.06c-.39.39-.39 1.03 0 1.41s1.03.39 1.41 0l1.06-1.06zM7.05 18.36a.996.996 0 000-1.41.996.996 0 00-1.41 0l-1.06 1.06c-.39.39-.39 1.03 0 1.41s1.03.39 1.41 0l1.06-1.06z"/></svg>',
+            mobile: '<svg class="icon-svg" viewBox="0 0 24 24"><path d="M17 1.01L7 1c-1.1 0-2 .9-2 2v18c0 1.1.9 2 2 2h10c1.1 0 2-.9 2-2V3c0-1.1-.9-1.99-2-1.99zM17 19H7V5h10v14z"/></svg>',
+            desktop: '<svg class="icon-svg" viewBox="0 0 24 24"><path d="M21 2H3c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h7l-2 3v1h8v-1l-2-3h7c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 12H3V4h18v10z"/></svg>'
+        };
+
+        // Переключение темы
+        document.getElementById('themeBtn').addEventListener('click', function () {
+            document.body.classList.toggle('light-theme');
+            const isLight = document.body.classList.contains('light-theme');
+            this.innerHTML = isLight ? icons.sun : icons.moon;
+            window.chrome.webview.postMessage('toggle_theme');
+        });
+
+        // Переключение вида
+        document.getElementById('viewBtn').addEventListener('click', function () {
+            const wrapper = document.getElementById('messageWrapper');
+            wrapper.classList.toggle('mobile');
+            const isMobile = wrapper.classList.contains('mobile');
+            this.innerHTML = isMobile ? icons.mobile : icons.desktop;
+            window.chrome.webview.postMessage('toggle_view');
+        });
+
+        // Функция обновления данных из C#
+        window.updatePreview = function (data) {
+            // 1. Скрываем лоадер с плавной анимацией
+            const loader = document.getElementById('loader');
+            if (loader) {
+                loader.classList.add('hidden');
+            }
+
+            // 2. Обновляем данные
+            document.getElementById('dateBadge').textContent = data.date;
+            document.getElementById('channelName').textContent = data.channelName;
+            document.getElementById('channelType').textContent = data.channelType;
+            document.getElementById('attachmentsContainer').innerHTML = data.attachmentsHtml;
+            document.getElementById('messageText').innerHTML = data.messageText;
+            document.getElementById('viewsCount').textContent = data.views;
+            document.getElementById('messageTime').textContent = data.time;
+
+            // 3. Рандомная иконка закрепа
+            const pinnedIcon = document.getElementById('pinnedIcon');
+            if (Math.random() > 0.5) {
+                pinnedIcon.classList.add('visible');
+            } else {
+                pinnedIcon.classList.remove('visible');
+            }
+        };
+
+        // Загрузка
+        window.addEventListener('load', function () {
+            if (window.chrome && window.chrome.webview) {
+                window.chrome.webview.postMessage('ready');
+            }
+        });
+    </script>
+</body>
+</html>

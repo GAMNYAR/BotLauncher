@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "BotLauncher": {
+      "commandName": "Project",
+      "workingDirectory": "C:\\Users\\dimah\\source\\repos\\BotLauncher\\BotLauncher\\bin\\Debug\\net8.0-windows"
+    }
+  }
+}
