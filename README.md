@@ -1,3 +1,12 @@
+<div align="center">
+
+![Version](https://img.shields.io/github/v/release/GAMNYAR/BotLauncher?label=Версия&color=blue)
+![License](https://img.shields.io/github/license/GAMNYAR/BotLauncher?label=Лицензия&color=green)
+![Downloads](https://img.shields.io/github/downloads/GAMNYAR/BotLauncher/total?label=Скачиваний&color=orange)
+![C#](https://img.shields.io/badge/C%23-.NET%208-512BD4?logo=csharp&logoColor=white)
+
+</div>
+
 ## 📥 Скачать последнюю версию
 
 👉 **[Скачать установщик BotLauncher v1.0](https://github.com/GAMNYAR/BotLauncher/releases/download/v1.0/BotLauncher_Setup.exe)**
