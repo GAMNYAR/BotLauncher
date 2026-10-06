@@ -149,16 +149,7 @@
 
 ## 🖼️ Скриншоты
 
-*(Здесь будут скриншоты интерфейса. Чтобы добавить свои, просто перетащите изображения в этот файл при редактировании на GitHub)*
-
-### Главное окно и подключение
-![Главное окно](https://via.placeholder.com/800x450/1a1f2e/ffffff?text=Главное+окно+BotLauncher)
-
-### Ручной режим отправки с настройками
-![Ручной режим](https://via.placeholder.com/800x450/1a1f2e/ffffff?text=Ручной+режим+отправки)
-
-### Редактор шаблонов с HTML-разметкой
-![Шаблоны](https://via.placeholder.com/800x450/1a1f2e/ffffff?text=Создание+шаблона)
+<img width="1218" height="761" alt="image" src="https://github.com/user-attachments/assets/72b00c30-9607-4c8d-ab10-008e06eca7d5" /> <img width="1218" height="761" alt="BotLauncher_B023ZtV2gZ" src="https://github.com/user-attachments/assets/78f5ead6-fdb9-4c1c-8680-42cdb6a07c43" /> <img width="1218" height="761" alt="image" src="https://github.com/user-attachments/assets/1a054f00-1e29-482f-a021-495ee0a80fc1" /> <img width="1218" height="761" alt="image" src="https://github.com/user-attachments/assets/691854a3-9c00-4d1c-8fae-d810af8b6869" /> <img width="1218" height="761" alt="image" src="https://github.com/user-attachments/assets/5a70d4ad-82b9-4ce1-a8f7-c82e5f165b5e" /> <img width="1218" height="761" alt="image" src="https://github.com/user-attachments/assets/0f728832-6bcf-40ea-b840-ccb293682f4d" />
 
 ---
 
