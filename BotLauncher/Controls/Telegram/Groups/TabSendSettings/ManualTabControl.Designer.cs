@@ -130,7 +130,7 @@
             chkManualConfirm.Checked = true;
             chkManualConfirm.Font = new Font("Segoe UI Semibold", 9F, FontStyle.Bold);
             chkManualConfirm.ForeColor = Color.White;
-            chkManualConfirm.Location = new Point(46, 10);
+            chkManualConfirm.Location = new Point(52, 10);
             chkManualConfirm.MinimumSize = new Size(1, 1);
             chkManualConfirm.Name = "chkManualConfirm";
             chkManualConfirm.Size = new Size(333, 25);
@@ -173,6 +173,7 @@
             btnSendManual.FillPressColor = Color.FromArgb(90, 24, 154);
             btnSendManual.FillSelectedColor = Color.Transparent;
             btnSendManual.Font = new Font("Segoe UI", 9F, FontStyle.Bold);
+            btnSendManual.ForeDisableColor = Color.White;
             btnSendManual.Location = new Point(543, 5);
             btnSendManual.MinimumSize = new Size(1, 1);
             btnSendManual.Name = "btnSendManual";
@@ -256,7 +257,7 @@
             label4.BackColor = Color.Transparent;
             label4.Font = new Font("Segoe UI Semibold", 8.25F, FontStyle.Bold);
             label4.ForeColor = Color.FromArgb(180, 180, 180);
-            label4.Location = new Point(441, 147);
+            label4.Location = new Point(441, 134);
             label4.Name = "label4";
             label4.Size = new Size(32, 13);
             label4.TabIndex = 121;
@@ -268,7 +269,7 @@
             label3.BackColor = Color.Transparent;
             label3.Font = new Font("Segoe UI Semibold", 8.25F, FontStyle.Bold);
             label3.ForeColor = Color.FromArgb(180, 180, 180);
-            label3.Location = new Point(441, 181);
+            label3.Location = new Point(441, 168);
             label3.Name = "label3";
             label3.Size = new Size(32, 13);
             label3.TabIndex = 120;
@@ -280,7 +281,7 @@
             label2.BackColor = Color.Transparent;
             label2.Font = new Font("Segoe UI Semibold", 8.25F, FontStyle.Bold);
             label2.ForeColor = Color.FromArgb(180, 180, 180);
-            label2.Location = new Point(311, 181);
+            label2.Location = new Point(311, 168);
             label2.Name = "label2";
             label2.Size = new Size(27, 13);
             label2.TabIndex = 119;
@@ -292,7 +293,7 @@
             label1.BackColor = Color.Transparent;
             label1.Font = new Font("Segoe UI Semibold", 8.25F, FontStyle.Bold);
             label1.ForeColor = Color.FromArgb(180, 180, 180);
-            label1.Location = new Point(311, 147);
+            label1.Location = new Point(311, 134);
             label1.Name = "label1";
             label1.Size = new Size(27, 13);
             label1.TabIndex = 118;
@@ -308,7 +309,7 @@
             nudManualAutoDeleteMinutes.ForeColor = Color.White;
             nudManualAutoDeleteMinutes.ForeDisableColor = Color.White;
             nudManualAutoDeleteMinutes.ForeReadOnlyColor = Color.Transparent;
-            nudManualAutoDeleteMinutes.Location = new Point(350, 175);
+            nudManualAutoDeleteMinutes.Location = new Point(350, 162);
             nudManualAutoDeleteMinutes.Margin = new Padding(4, 5, 4, 5);
             nudManualAutoDeleteMinutes.Maximum = 59D;
             nudManualAutoDeleteMinutes.Minimum = 0D;
@@ -337,7 +338,7 @@
             nudManualAutoDeleteSeconds.ForeColor = Color.White;
             nudManualAutoDeleteSeconds.ForeDisableColor = Color.White;
             nudManualAutoDeleteSeconds.ForeReadOnlyColor = Color.Transparent;
-            nudManualAutoDeleteSeconds.Location = new Point(220, 175);
+            nudManualAutoDeleteSeconds.Location = new Point(220, 162);
             nudManualAutoDeleteSeconds.Margin = new Padding(4, 5, 4, 5);
             nudManualAutoDeleteSeconds.Maximum = 59D;
             nudManualAutoDeleteSeconds.Minimum = 0D;
@@ -366,7 +367,7 @@
             nudManualDelayMinutes.ForeColor = Color.White;
             nudManualDelayMinutes.ForeDisableColor = Color.White;
             nudManualDelayMinutes.ForeReadOnlyColor = Color.Transparent;
-            nudManualDelayMinutes.Location = new Point(350, 140);
+            nudManualDelayMinutes.Location = new Point(350, 127);
             nudManualDelayMinutes.Margin = new Padding(4, 5, 4, 5);
             nudManualDelayMinutes.Maximum = 59D;
             nudManualDelayMinutes.Minimum = 0D;
@@ -395,7 +396,7 @@
             nudManualDelaySeconds.ForeColor = Color.White;
             nudManualDelaySeconds.ForeDisableColor = Color.White;
             nudManualDelaySeconds.ForeReadOnlyColor = Color.Transparent;
-            nudManualDelaySeconds.Location = new Point(220, 140);
+            nudManualDelaySeconds.Location = new Point(220, 127);
             nudManualDelaySeconds.Margin = new Padding(4, 5, 4, 5);
             nudManualDelaySeconds.Maximum = 59D;
             nudManualDelaySeconds.Minimum = 0D;
@@ -420,7 +421,7 @@
             chkManualAutoDelete.CheckBoxColor = Color.BlueViolet;
             chkManualAutoDelete.Font = new Font("Segoe UI Semibold", 9F, FontStyle.Bold);
             chkManualAutoDelete.ForeColor = Color.White;
-            chkManualAutoDelete.Location = new Point(5, 175);
+            chkManualAutoDelete.Location = new Point(5, 162);
             chkManualAutoDelete.MinimumSize = new Size(1, 1);
             chkManualAutoDelete.Name = "chkManualAutoDelete";
             chkManualAutoDelete.Size = new Size(208, 25);
@@ -433,7 +434,7 @@
             chkManualDelay.CheckBoxColor = Color.BlueViolet;
             chkManualDelay.Font = new Font("Segoe UI Semibold", 9F, FontStyle.Bold);
             chkManualDelay.ForeColor = Color.White;
-            chkManualDelay.Location = new Point(5, 140);
+            chkManualDelay.Location = new Point(5, 127);
             chkManualDelay.MinimumSize = new Size(1, 1);
             chkManualDelay.Name = "chkManualDelay";
             chkManualDelay.Size = new Size(208, 25);
@@ -480,7 +481,7 @@
             chkManualAnimatedEffect.CheckBoxColor = Color.BlueViolet;
             chkManualAnimatedEffect.Font = new Font("Segoe UI Semibold", 9F, FontStyle.Bold);
             chkManualAnimatedEffect.ForeColor = Color.White;
-            chkManualAnimatedEffect.Location = new Point(5, 510);
+            chkManualAnimatedEffect.Location = new Point(5, 512);
             chkManualAnimatedEffect.MinimumSize = new Size(1, 1);
             chkManualAnimatedEffect.Name = "chkManualAnimatedEffect";
             chkManualAnimatedEffect.Size = new Size(239, 25);
@@ -503,7 +504,7 @@
             cmbManualAnimatedEffect.Items.AddRange(new object[] { "Отменить выбор", "👍 Лайк", "👎 Дизлайк", "❤️ Сердце", "🔥 Огонь", "\U0001f970 Лицо с сердечками", "👏 Аплодисменты", "😁 Улыбка", "🤔 Задумчивость", "\U0001f92f Взрыв мозга", "😱 Крик от страха", "\U0001f92c Мат", "😢 Плач", "🎉 Праздник", "\U0001f929 Звёзды в глазах", "\U0001f92e Тошнота", "💩 Какашка", "🙏 Молитва", "👌 ОК", "🕊️ Голубь", "\U0001f91d Рукопожатие", "🍾 Бутылка", "🎂 Торт", "🎄 Ёлка", "🎆 Фейерверк", "🎇 Бенгальский огонь", "\U0001f9e8 Петарда", "✨ Искры", "🎈 Шарик", "🎊 Конфетти", "🎁 Подарок", "🏆 Трофей", "\U0001f947 Медаль", "⚽ Мяч", "🏀 Баскетбол", "🎯 Мишень", "🎲 Кубик", "🎰 Слот-машина", "🎳 Боулинг", "🍕 Пицца", "🍔 Бургер", "🍟 Картошка фри", "🍿 Попкорн", "☕ Кофе", "🍺 Пиво", "\U0001f942 Бокалы", "🚀 Ракета", "✈️ Самолёт", "🌟 Звезда", "💯 100 баллов", "🌈 Радуга", "☃️ Снеговик", "⛄ Снеговик", "🎃 Тыква", "🎅 Санта", "\U0001f936 Снегурочка", "🔔 Колокольчик", "🎵 Нота", "🎶 Ноты", "💤 Сон", "💣 Бомба", "💥 Столкновение", "💦 Капли", "💨 Ветер" });
             cmbManualAnimatedEffect.ItemSelectBackColor = Color.FromArgb(124, 58, 237);
             cmbManualAnimatedEffect.ItemSelectForeColor = Color.White;
-            cmbManualAnimatedEffect.Location = new Point(254, 510);
+            cmbManualAnimatedEffect.Location = new Point(254, 512);
             cmbManualAnimatedEffect.Margin = new Padding(4, 5, 4, 5);
             cmbManualAnimatedEffect.MinimumSize = new Size(63, 0);
             cmbManualAnimatedEffect.Name = "cmbManualAnimatedEffect";
@@ -534,7 +535,7 @@
             cmbManualEffectApplyTo.Items.AddRange(new object[] { "Отменить выбор", "Только на сообщение", "Только на шаблон", "На оба" });
             cmbManualEffectApplyTo.ItemSelectBackColor = Color.FromArgb(124, 58, 237);
             cmbManualEffectApplyTo.ItemSelectForeColor = Color.White;
-            cmbManualEffectApplyTo.Location = new Point(416, 510);
+            cmbManualEffectApplyTo.Location = new Point(416, 512);
             cmbManualEffectApplyTo.Margin = new Padding(4, 5, 4, 5);
             cmbManualEffectApplyTo.MinimumSize = new Size(63, 0);
             cmbManualEffectApplyTo.Name = "cmbManualEffectApplyTo";
@@ -555,7 +556,7 @@
             chkManualAnimatedEmoji.CheckBoxColor = Color.BlueViolet;
             chkManualAnimatedEmoji.Font = new Font("Segoe UI Semibold", 9F, FontStyle.Bold);
             chkManualAnimatedEmoji.ForeColor = Color.White;
-            chkManualAnimatedEmoji.Location = new Point(5, 480);
+            chkManualAnimatedEmoji.Location = new Point(5, 482);
             chkManualAnimatedEmoji.MinimumSize = new Size(1, 1);
             chkManualAnimatedEmoji.Name = "chkManualAnimatedEmoji";
             chkManualAnimatedEmoji.Size = new Size(239, 25);
@@ -578,7 +579,7 @@
             cmbManualAnimatedEmoji.Items.AddRange(new object[] { "Отменить выбор", "👍 Лайк", "👎 Дизлайк", "❤️ Сердце", "🔥 Огонь", "\U0001f970 Лицо с сердечками", "👏 Аплодисменты", "😁 Улыбка", "🤔 Задумчивость", "\U0001f92f Взрыв мозга", "😱 Крик от страха", "\U0001f92c Мат", "😢 Плач", "🎉 Праздник", "\U0001f929 Звёзды в глазах", "\U0001f92e Тошнота", "💩 Какашка", "🙏 Молитва", "👌 ОК", "🕊️ Голубь", "\U0001f91d Рукопожатие", "🍾 Бутылка", "🎂 Торт", "🎄 Ёлка", "🎆 Фейерверк", "🎇 Бенгальский огонь", "\U0001f9e8 Петарда", "✨ Искры", "🎈 Шарик", "🎊 Конфетти", "🎁 Подарок", "🏆 Трофей", "\U0001f947 Медаль", "⚽ Мяч", "🏀 Баскетбол", "🎯 Мишень", "🎲 Кубик", "🎰 Слот-машина", "🎳 Боулинг", "🍕 Пицца", "🍔 Бургер", "🍟 Картошка фри", "🍿 Попкорн", "☕ Кофе", "🍺 Пиво", "\U0001f942 Бокалы", "🚀 Ракета", "✈️ Самолёт", "🌟 Звезда", "💯 100 баллов", "🌈 Радуга", "☃️ Снеговик", "⛄ Снеговик", "🎃 Тыква", "🎅 Санта", "\U0001f936 Снегурочка", "🔔 Колокольчик", "🎵 Нота", "🎶 Ноты", "💤 Сон", "💣 Бомба", "💥 Столкновение", "💦 Капли", "💨 Ветер" });
             cmbManualAnimatedEmoji.ItemSelectBackColor = Color.FromArgb(124, 58, 237);
             cmbManualAnimatedEmoji.ItemSelectForeColor = Color.White;
-            cmbManualAnimatedEmoji.Location = new Point(254, 480);
+            cmbManualAnimatedEmoji.Location = new Point(254, 482);
             cmbManualAnimatedEmoji.Margin = new Padding(4, 5, 4, 5);
             cmbManualAnimatedEmoji.MinimumSize = new Size(63, 0);
             cmbManualAnimatedEmoji.Name = "cmbManualAnimatedEmoji";
@@ -610,7 +611,7 @@
             cmbManualEmojiApplyTo.Items.AddRange(new object[] { "Отменить выбор", "После пользовательского сообщения", "После шаблона", "После всех сообщений", "Перед всеми сообщениями", "После каждого сообщения" });
             cmbManualEmojiApplyTo.ItemSelectBackColor = Color.FromArgb(124, 58, 237);
             cmbManualEmojiApplyTo.ItemSelectForeColor = Color.White;
-            cmbManualEmojiApplyTo.Location = new Point(416, 480);
+            cmbManualEmojiApplyTo.Location = new Point(416, 482);
             cmbManualEmojiApplyTo.Margin = new Padding(4, 5, 4, 5);
             cmbManualEmojiApplyTo.MinimumSize = new Size(63, 0);
             cmbManualEmojiApplyTo.Name = "cmbManualEmojiApplyTo";
@@ -642,7 +643,7 @@
             cmbManualPinTarget.Items.AddRange(new object[] { "Отменить выбор", "Закрепить только шаблон", "Закрепить только текст", "Закрепить оба (сначала шаблон, потом текст)", "Закрепить оба (сначала текст, потом шаблон)" });
             cmbManualPinTarget.ItemSelectBackColor = Color.FromArgb(124, 58, 237);
             cmbManualPinTarget.ItemSelectForeColor = Color.White;
-            cmbManualPinTarget.Location = new Point(103, 442);
+            cmbManualPinTarget.Location = new Point(103, 444);
             cmbManualPinTarget.Margin = new Padding(4, 5, 4, 5);
             cmbManualPinTarget.MinimumSize = new Size(63, 0);
             cmbManualPinTarget.Name = "cmbManualPinTarget";
@@ -663,7 +664,7 @@
             chkManualPinMessage.CheckBoxColor = Color.BlueViolet;
             chkManualPinMessage.Font = new Font("Segoe UI Semibold", 9F, FontStyle.Bold);
             chkManualPinMessage.ForeColor = Color.White;
-            chkManualPinMessage.Location = new Point(5, 442);
+            chkManualPinMessage.Location = new Point(5, 444);
             chkManualPinMessage.MinimumSize = new Size(1, 1);
             chkManualPinMessage.Name = "chkManualPinMessage";
             chkManualPinMessage.Size = new Size(95, 25);
@@ -676,7 +677,7 @@
             chkManualDeletePrevious.CheckBoxColor = Color.BlueViolet;
             chkManualDeletePrevious.Font = new Font("Segoe UI Semibold", 9F, FontStyle.Bold);
             chkManualDeletePrevious.ForeColor = Color.White;
-            chkManualDeletePrevious.Location = new Point(5, 408);
+            chkManualDeletePrevious.Location = new Point(5, 400);
             chkManualDeletePrevious.MinimumSize = new Size(1, 1);
             chkManualDeletePrevious.Name = "chkManualDeletePrevious";
             chkManualDeletePrevious.Size = new Size(346, 25);
@@ -689,7 +690,7 @@
             chkManualProtectContent.CheckBoxColor = Color.BlueViolet;
             chkManualProtectContent.Font = new Font("Segoe UI Semibold", 9F, FontStyle.Bold);
             chkManualProtectContent.ForeColor = Color.White;
-            chkManualProtectContent.Location = new Point(282, 377);
+            chkManualProtectContent.Location = new Point(282, 369);
             chkManualProtectContent.MinimumSize = new Size(1, 1);
             chkManualProtectContent.Name = "chkManualProtectContent";
             chkManualProtectContent.Size = new Size(346, 25);
@@ -702,7 +703,7 @@
             chkManualHideSpoiler.CheckBoxColor = Color.BlueViolet;
             chkManualHideSpoiler.Font = new Font("Segoe UI Semibold", 9F, FontStyle.Bold);
             chkManualHideSpoiler.ForeColor = Color.White;
-            chkManualHideSpoiler.Location = new Point(5, 377);
+            chkManualHideSpoiler.Location = new Point(5, 369);
             chkManualHideSpoiler.MinimumSize = new Size(1, 1);
             chkManualHideSpoiler.Name = "chkManualHideSpoiler";
             chkManualHideSpoiler.Size = new Size(264, 25);
@@ -715,7 +716,7 @@
             chkManualReplyToLast.CheckBoxColor = Color.BlueViolet;
             chkManualReplyToLast.Font = new Font("Segoe UI Semibold", 9F, FontStyle.Bold);
             chkManualReplyToLast.ForeColor = Color.White;
-            chkManualReplyToLast.Location = new Point(282, 347);
+            chkManualReplyToLast.Location = new Point(282, 339);
             chkManualReplyToLast.MinimumSize = new Size(1, 1);
             chkManualReplyToLast.Name = "chkManualReplyToLast";
             chkManualReplyToLast.Size = new Size(346, 25);
@@ -728,7 +729,7 @@
             chkManualSilentSend.CheckBoxColor = Color.BlueViolet;
             chkManualSilentSend.Font = new Font("Segoe UI Semibold", 9F, FontStyle.Bold);
             chkManualSilentSend.ForeColor = Color.White;
-            chkManualSilentSend.Location = new Point(5, 347);
+            chkManualSilentSend.Location = new Point(5, 339);
             chkManualSilentSend.MinimumSize = new Size(1, 1);
             chkManualSilentSend.Name = "chkManualSilentSend";
             chkManualSilentSend.Size = new Size(264, 25);
@@ -741,7 +742,7 @@
             chkManualDisablePreview.CheckBoxColor = Color.BlueViolet;
             chkManualDisablePreview.Font = new Font("Segoe UI Semibold", 9F, FontStyle.Bold);
             chkManualDisablePreview.ForeColor = Color.White;
-            chkManualDisablePreview.Location = new Point(282, 317);
+            chkManualDisablePreview.Location = new Point(282, 309);
             chkManualDisablePreview.MinimumSize = new Size(1, 1);
             chkManualDisablePreview.Name = "chkManualDisablePreview";
             chkManualDisablePreview.Size = new Size(346, 25);
@@ -754,7 +755,7 @@
             chkManualSendTemplateFirst.CheckBoxColor = Color.BlueViolet;
             chkManualSendTemplateFirst.Font = new Font("Segoe UI Semibold", 9F, FontStyle.Bold);
             chkManualSendTemplateFirst.ForeColor = Color.White;
-            chkManualSendTemplateFirst.Location = new Point(5, 317);
+            chkManualSendTemplateFirst.Location = new Point(5, 309);
             chkManualSendTemplateFirst.MinimumSize = new Size(1, 1);
             chkManualSendTemplateFirst.Name = "chkManualSendTemplateFirst";
             chkManualSendTemplateFirst.Size = new Size(264, 25);
@@ -767,7 +768,7 @@
             chkManualNotifyError.CheckBoxColor = Color.BlueViolet;
             chkManualNotifyError.Font = new Font("Segoe UI Semibold", 9F, FontStyle.Bold);
             chkManualNotifyError.ForeColor = Color.White;
-            chkManualNotifyError.Location = new Point(5, 275);
+            chkManualNotifyError.Location = new Point(5, 265);
             chkManualNotifyError.MinimumSize = new Size(1, 1);
             chkManualNotifyError.Name = "chkManualNotifyError";
             chkManualNotifyError.Size = new Size(265, 25);
@@ -791,7 +792,7 @@
             cmbManualNotifyError1.Items.AddRange(new object[] { "Отменить выбор", "В личные сообщения", "В приложении" });
             cmbManualNotifyError1.ItemSelectBackColor = Color.FromArgb(124, 58, 237);
             cmbManualNotifyError1.ItemSelectForeColor = Color.White;
-            cmbManualNotifyError1.Location = new Point(276, 275);
+            cmbManualNotifyError1.Location = new Point(276, 265);
             cmbManualNotifyError1.Margin = new Padding(4, 5, 4, 5);
             cmbManualNotifyError1.MinimumSize = new Size(63, 0);
             cmbManualNotifyError1.Name = "cmbManualNotifyError1";
@@ -812,7 +813,7 @@
             lblManualNotifyErrorOr.BackColor = Color.Transparent;
             lblManualNotifyErrorOr.Font = new Font("Segoe UI Semibold", 8.25F, FontStyle.Bold);
             lblManualNotifyErrorOr.ForeColor = Color.FromArgb(180, 180, 180);
-            lblManualNotifyErrorOr.Location = new Point(428, 280);
+            lblManualNotifyErrorOr.Location = new Point(428, 270);
             lblManualNotifyErrorOr.Name = "lblManualNotifyErrorOr";
             lblManualNotifyErrorOr.Size = new Size(39, 13);
             lblManualNotifyErrorOr.TabIndex = 102;
@@ -835,7 +836,7 @@
             cmbManualNotifyError2.Items.AddRange(new object[] { "Отменить выбор", "В личные сообщения", "В приложении" });
             cmbManualNotifyError2.ItemSelectBackColor = Color.FromArgb(124, 58, 237);
             cmbManualNotifyError2.ItemSelectForeColor = Color.White;
-            cmbManualNotifyError2.Location = new Point(475, 275);
+            cmbManualNotifyError2.Location = new Point(475, 265);
             cmbManualNotifyError2.Margin = new Padding(4, 5, 4, 5);
             cmbManualNotifyError2.MinimumSize = new Size(63, 0);
             cmbManualNotifyError2.Name = "cmbManualNotifyError2";
@@ -856,7 +857,7 @@
             chkManualNotifyComplete.CheckBoxColor = Color.BlueViolet;
             chkManualNotifyComplete.Font = new Font("Segoe UI Semibold", 9F, FontStyle.Bold);
             chkManualNotifyComplete.ForeColor = Color.White;
-            chkManualNotifyComplete.Location = new Point(5, 245);
+            chkManualNotifyComplete.Location = new Point(5, 235);
             chkManualNotifyComplete.MinimumSize = new Size(1, 1);
             chkManualNotifyComplete.Name = "chkManualNotifyComplete";
             chkManualNotifyComplete.Size = new Size(265, 25);
@@ -880,7 +881,7 @@
             cmbManualNotifyComplete1.Items.AddRange(new object[] { "Отменить выбор", "В личные сообщения", "В приложении" });
             cmbManualNotifyComplete1.ItemSelectBackColor = Color.FromArgb(124, 58, 237);
             cmbManualNotifyComplete1.ItemSelectForeColor = Color.White;
-            cmbManualNotifyComplete1.Location = new Point(276, 245);
+            cmbManualNotifyComplete1.Location = new Point(276, 235);
             cmbManualNotifyComplete1.Margin = new Padding(4, 5, 4, 5);
             cmbManualNotifyComplete1.MinimumSize = new Size(63, 0);
             cmbManualNotifyComplete1.Name = "cmbManualNotifyComplete1";
@@ -901,7 +902,7 @@
             lblManualNotifyCompleteOr.BackColor = Color.Transparent;
             lblManualNotifyCompleteOr.Font = new Font("Segoe UI Semibold", 8.25F, FontStyle.Bold);
             lblManualNotifyCompleteOr.ForeColor = Color.FromArgb(180, 180, 180);
-            lblManualNotifyCompleteOr.Location = new Point(428, 250);
+            lblManualNotifyCompleteOr.Location = new Point(428, 240);
             lblManualNotifyCompleteOr.Name = "lblManualNotifyCompleteOr";
             lblManualNotifyCompleteOr.Size = new Size(39, 13);
             lblManualNotifyCompleteOr.TabIndex = 101;
@@ -924,7 +925,7 @@
             cmbManualNotifyComplete2.Items.AddRange(new object[] { "Отменить выбор", "В личные сообщения", "В приложении" });
             cmbManualNotifyComplete2.ItemSelectBackColor = Color.FromArgb(124, 58, 237);
             cmbManualNotifyComplete2.ItemSelectForeColor = Color.White;
-            cmbManualNotifyComplete2.Location = new Point(475, 245);
+            cmbManualNotifyComplete2.Location = new Point(475, 235);
             cmbManualNotifyComplete2.Margin = new Padding(4, 5, 4, 5);
             cmbManualNotifyComplete2.MinimumSize = new Size(63, 0);
             cmbManualNotifyComplete2.Name = "cmbManualNotifyComplete2";
@@ -945,7 +946,7 @@
             chkManualNotifySuccess.CheckBoxColor = Color.BlueViolet;
             chkManualNotifySuccess.Font = new Font("Segoe UI Semibold", 9F, FontStyle.Bold);
             chkManualNotifySuccess.ForeColor = Color.White;
-            chkManualNotifySuccess.Location = new Point(5, 215);
+            chkManualNotifySuccess.Location = new Point(5, 205);
             chkManualNotifySuccess.MinimumSize = new Size(1, 1);
             chkManualNotifySuccess.Name = "chkManualNotifySuccess";
             chkManualNotifySuccess.Size = new Size(265, 25);
@@ -969,7 +970,7 @@
             cmbManualNotifySuccess1.Items.AddRange(new object[] { "Отменить выбор", "В личные сообщения", "В приложении" });
             cmbManualNotifySuccess1.ItemSelectBackColor = Color.FromArgb(124, 58, 237);
             cmbManualNotifySuccess1.ItemSelectForeColor = Color.White;
-            cmbManualNotifySuccess1.Location = new Point(276, 215);
+            cmbManualNotifySuccess1.Location = new Point(276, 205);
             cmbManualNotifySuccess1.Margin = new Padding(4, 5, 4, 5);
             cmbManualNotifySuccess1.MinimumSize = new Size(63, 0);
             cmbManualNotifySuccess1.Name = "cmbManualNotifySuccess1";
@@ -990,7 +991,7 @@
             lblManualNotifySuccessOr.BackColor = Color.Transparent;
             lblManualNotifySuccessOr.Font = new Font("Segoe UI Semibold", 8.25F, FontStyle.Bold);
             lblManualNotifySuccessOr.ForeColor = Color.FromArgb(180, 180, 180);
-            lblManualNotifySuccessOr.Location = new Point(428, 220);
+            lblManualNotifySuccessOr.Location = new Point(428, 210);
             lblManualNotifySuccessOr.Name = "lblManualNotifySuccessOr";
             lblManualNotifySuccessOr.Size = new Size(39, 13);
             lblManualNotifySuccessOr.TabIndex = 100;
@@ -1013,7 +1014,7 @@
             cmbManualNotifySuccess2.Items.AddRange(new object[] { "Отменить выбор", "В личные сообщения", "В приложении" });
             cmbManualNotifySuccess2.ItemSelectBackColor = Color.FromArgb(124, 58, 237);
             cmbManualNotifySuccess2.ItemSelectForeColor = Color.White;
-            cmbManualNotifySuccess2.Location = new Point(475, 215);
+            cmbManualNotifySuccess2.Location = new Point(475, 205);
             cmbManualNotifySuccess2.Margin = new Padding(4, 5, 4, 5);
             cmbManualNotifySuccess2.MinimumSize = new Size(63, 0);
             cmbManualNotifySuccess2.Name = "cmbManualNotifySuccess2";
@@ -1035,7 +1036,7 @@
             lblManualTemplateHint.ForeColor = Color.DarkGray;
             lblManualTemplateHint.Location = new Point(5, 69);
             lblManualTemplateHint.Name = "lblManualTemplateHint";
-            lblManualTemplateHint.Size = new Size(658, 55);
+            lblManualTemplateHint.Size = new Size(658, 43);
             lblManualTemplateHint.TabIndex = 33;
             lblManualTemplateHint.Text = resources.GetString("lblManualTemplateHint.Text");
             // 
@@ -1045,8 +1046,13 @@
             txtManualCustomText.ButtonFillColor = Color.Transparent;
             txtManualCustomText.ButtonStyleInherited = false;
             txtManualCustomText.FillColor = Color.FromArgb(42, 46, 57);
+            txtManualCustomText.FillColor2 = Color.Transparent;
+            txtManualCustomText.FillDisableColor = Color.FromArgb(37, 40, 50);
+            txtManualCustomText.FillReadOnlyColor = Color.Transparent;
             txtManualCustomText.Font = new Font("Segoe UI", 9F);
             txtManualCustomText.ForeColor = Color.White;
+            txtManualCustomText.ForeDisableColor = Color.White;
+            txtManualCustomText.ForeReadOnlyColor = Color.Transparent;
             txtManualCustomText.Location = new Point(5, 40);
             txtManualCustomText.Margin = new Padding(4, 5, 4, 5);
             txtManualCustomText.MinimumSize = new Size(1, 16);
@@ -1056,7 +1062,7 @@
             txtManualCustomText.RectDisableColor = Color.FromArgb(54, 59, 70);
             txtManualCustomText.RectReadOnlyColor = Color.Transparent;
             txtManualCustomText.ShowText = false;
-            txtManualCustomText.Size = new Size(655, 25);
+            txtManualCustomText.Size = new Size(658, 25);
             txtManualCustomText.Style = Sunny.UI.UIStyle.Custom;
             txtManualCustomText.TabIndex = 32;
             txtManualCustomText.TextAlignment = ContentAlignment.MiddleLeft;
@@ -1084,7 +1090,7 @@
             cmbManualTemplate.Padding = new Padding(0, 0, 30, 2);
             cmbManualTemplate.RectColor = Color.FromArgb(65, 71, 84);
             cmbManualTemplate.RectDisableColor = Color.FromArgb(54, 59, 70);
-            cmbManualTemplate.Size = new Size(655, 25);
+            cmbManualTemplate.Size = new Size(658, 25);
             cmbManualTemplate.Style = Sunny.UI.UIStyle.Custom;
             cmbManualTemplate.StyleDropDown = Sunny.UI.UIStyle.Purple;
             cmbManualTemplate.SymbolSize = 24;

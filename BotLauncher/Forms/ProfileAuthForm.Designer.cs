@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ProfileAuthForm));
             contentPanel = new Sunny.UI.UIPanel();
             SuspendLayout();
             // 
@@ -61,6 +62,7 @@
             Controls.Add(contentPanel);
             DoubleBuffered = true;
             ForeColor = Color.White;
+            Icon = (Icon)resources.GetObject("$this.Icon");
             MinimumSize = new Size(450, 700);
             Name = "ProfileAuthForm";
             StartPosition = FormStartPosition.CenterScreen;

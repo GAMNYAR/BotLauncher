@@ -136,7 +136,7 @@
             // btnSavePriority
             // 
             btnSavePriority.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            btnSavePriority.FillColor = Color.BlueViolet;
+            btnSavePriority.FillColor = Color.FromArgb(108, 99, 255);
             btnSavePriority.FillColor2 = Color.Transparent;
             btnSavePriority.FillDisableColor = Color.FromArgb(30, 33, 40);
             btnSavePriority.FillHoverColor = Color.DarkOrchid;

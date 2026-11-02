@@ -1,0 +1,400 @@
+﻿<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Редактор сценариев</title>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script type="module">
+        import 'https://cdn.jsdelivr.net/npm/emoji-picker-element@1.22.8/index.js';
+    </script>
+    <link rel="stylesheet" href="css/variables.css">
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/components.css">
+</head>
+<body>
+    <!-- ВЕРХНЯЯ ПАНЕЛЬ -->
+    <div class="top-bar">
+        <div class="top-bar-left">
+            <button class="btn-icon" onclick="toggleLeftPanel()" title="Меню"><i data-lucide="menu"></i></button>
+        </div>
+        <div class="top-bar-center">
+            <div class="scenario-dropdown" onclick="toggleScenarioDropdown()">
+                <span id="scenarioNameDisplay">Новый сценарий</span>
+                <i data-lucide="chevron-down" style="width: 16px; height: 16px;"></i>
+            </div>
+        </div>
+        <div class="top-bar-right">
+            <button class="btn-icon" title="Поиск"><i data-lucide="search"></i></button>
+            <button class="btn-icon" onclick="toggleScenarioMenu()" title="Меню"><i data-lucide="more-horizontal"></i></button>
+            <button class="btn-save" id="btnSave">
+                <span class="dot"></span>
+                <span>Сохранить</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- МЕНЮ СЦЕНАРИЯ -->
+    <div class="scenario-menu" id="scenarioMenu">
+        <div class="scenario-menu-header" id="scenarioMenuTitle">Новый сценарий</div>
+        <div class="scenario-menu-status" id="scenarioMenuStatus">
+            <span class="dot"></span>
+            <span>Есть несохранённые изменения</span>
+        </div>
+        <div class="scenario-menu-time" id="scenarioMenuTime">Не сохранено</div>
+        <div class="scenario-menu-divider"></div>
+        <div class="scenario-menu-item" onclick="duplicateScenario()"><i data-lucide="copy"></i><span>Дублировать</span></div>
+        <div class="scenario-menu-item"><i data-lucide="eye"></i><span>Показать стартовый шаг</span></div>
+        <div class="scenario-menu-item"><i data-lucide="file-text"></i><span>Открыть опубликованную версию</span></div>
+        <div class="scenario-menu-item"><i data-lucide="rotate-ccw"></i><span>Вернуть опубликованную версию</span></div>
+        <div class="scenario-menu-divider"></div>
+        <div class="scenario-menu-item"><i data-lucide="settings"></i><span>Настройки редактора</span></div>
+        <div class="scenario-menu-divider"></div>
+        <div class="scenario-menu-item danger" onclick="deleteScenario()"><i data-lucide="trash-2"></i><span>Удалить сценарий</span></div>
+    </div>
+
+    <!-- ЛЕВАЯ ПАНЕЛЬ -->
+    <div class="left-panel" id="leftPanel">
+        <div class="settings-panel" id="settingsPanel">
+            <div id="scenarioListContainer"></div>
+            <div id="nodeSettingsContainer" style="display: none;">
+
+                <!-- ЗАГОЛОВОК ПАНЕЛИ -->
+                <div class="panel-header">
+                    <span class="panel-title">
+                        <i data-lucide="settings" style="width: 14px; height: 14px;"></i>
+                        <span id="panelTitleText">Настройки сообщения</span>
+                    </span>
+                </div>
+
+                <!-- ПОЛЕ ИМЕНИ НОДЫ -->
+                <div class="node-name-editor">
+                    <input type="text" class="node-name-input" id="nodeNameInput" placeholder="Название ноды..." maxlength="25">
+                </div>
+
+                <!-- СЕКЦИЯ СОДЕРЖИМОГО -->
+                <div class="section-header" id="contentSectionHeader" onclick="toggleSection('contentSection')">
+                    <span>Содержимое</span>
+                </div>
+                <div id="contentSection">
+                    <!-- ЕДИНЫЙ БЛОК (режим "внутри") -->
+                    <div class="message-block-wrapper" id="messageBlockWrapper" style="display: none;">
+                        <div id="messagePreviewContainer"></div>
+                    </div>
+                    <!-- ОТДЕЛЬНЫЙ БЛОК (режим "снаружи") - ✅ ИСПРАВЛЕНО: добавлен класс и style -->
+                    <div class="message-block-wrapper" id="messagePreviewOutside" style="display: none;">
+                        <div id="messagePreviewContainerOutside"></div>
+                    </div>
+                </div>
+
+                <!-- ЗАГОЛОВОК КНОПОК -->
+                <div class="section-header" id="buttonsSectionHeader">
+                    <span>Кнопки</span>
+                    <div class="button-mode-toggle">
+                        <button id="btnModeOutside" onclick="setButtonMode(false)" class="active">Снаружи</button>
+                        <button id="btnModeInside" onclick="setButtonMode(true)">Внутри</button>
+                    </div>
+                </div>
+
+                <!-- СОДЕРЖИМОЕ СЕКЦИИ КНОПОК -->
+                <div id="buttonsSection">
+                    <div class="button-rows-container" id="buttonRowsContainer"></div>
+                    <div class="add-button-row" id="addButtonRow">
+                        <button class="add-button-link" id="addButtonLink" onclick="addNewButtonRow()">+ Добавить кнопку</button>
+                    </div>
+                </div>
+
+                <!-- ✅ СЕКЦИЯ ДЕЙСТВИЙ (для ноды "Выполнить") -->
+                <div id="executeActionsSection" style="display: none;">
+                    <div class="section-header" id="executeActionsHeader">
+                        <span>Действия</span>
+                    </div>
+                    <div id="executeActionsList" style="margin-bottom: 12px;"></div>
+                    <button class="add-button-link" onclick="addExecuteAction()" style="margin-bottom: 16px;">
+                        + Добавить действие
+                    </button>
+                </div>
+
+                <!-- СЕКЦИЯ ДОБАВИТЬ БЛОК -->
+                <div class="section-header" id="blocksSectionHeader" onclick="toggleSection('blocksSection')">
+                    <span>Добавить блок</span>
+                </div>
+                <div id="blocksSection">
+                    <div class="blocks-grid">
+                        <button class="block-btn" onclick="addBlock('text')">
+                            <span class="block-btn-icon"><i data-lucide="type"></i></span>
+                            <span>Текст</span>
+                        </button>
+                        <button class="block-btn" onclick="addBlock('execute')">
+                            <span class="block-btn-icon"><i data-lucide="zap"></i></span>
+                            <span>Выполнить</span>
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- КНОПКА СКРЫТИЯ ПАНЕЛИ -->
+    <button class="toggle-panel-btn" id="togglePanelBtn" onclick="toggleLeftPanel()"><i data-lucide="chevron-right"></i></button>
+
+    <!-- КОНТЕКСТНОЕ МЕНЮ КНОПОК -->
+    <div class="button-context-menu" id="buttonContextMenu">
+        <div class="button-context-item" onclick="toggleButtonsInside()">
+            <i data-lucide="layout"></i>
+            <span id="buttonsInsideText">Внутри сообщения</span>
+        </div>
+        <div class="button-context-item" onclick="duplicateButtonBlock()">
+            <i data-lucide="copy"></i>
+            <span>Дублировать</span>
+        </div>
+        <div class="button-context-item danger" onclick="deleteButtonBlock()">
+            <i data-lucide="trash-2"></i>
+            <span>Удалить</span>
+        </div>
+    </div>
+
+    <!-- КАНВАС -->
+    <div id="canvas-wrapper"><canvas id="graph-canvas"></canvas></div>
+
+    <!-- КОНТЕКСТНОЕ МЕНЮ (ПРАВЫЙ КЛИК НА ХОЛСТЕ) -->
+    <div class="context-menu" id="contextMenu">
+        <div class="context-item" onclick="addNodeFromContext('message')">
+            <span class="context-item-icon"><i data-lucide="message-circle"></i></span>
+            <span>Сообщение</span>
+        </div>
+        <div class="context-item" onclick="addNodeFromContext('execute')">
+            <span class="context-item-icon"><i data-lucide="zap"></i></span>
+            <span>Выполнить</span>
+        </div>
+        <button class="context-cancel" onclick="hideContextMenu()">Отмена</button>
+    </div>
+
+    <!-- МЕНЮ НОДЫ -->
+    <div class="context-menu" id="nodeMenu">
+        <div class="context-item" onclick="toggleStartStep()">
+            <i data-lucide="flag"></i>
+            <span>Стартовый шаг</span>
+            <span style="margin-left: auto; font-size: 11px; color: #6b6890;">Отсюда начнётся сценарий</span>
+            <i data-lucide="check" id="startStepCheck" style="margin-left: 8px; color: #10b981; display: none;"></i>
+        </div>
+        <div class="context-item" onclick="copyNode()"><i data-lucide="copy"></i><span>Копировать</span></div>
+        <div class="context-item" onclick="renameNode()"><i data-lucide="pencil"></i><span>Переименовать</span></div>
+        <div class="context-item danger" onclick="deleteSelectedNode()"><i data-lucide="trash-2"></i><span>Удалить</span></div>
+    </div>
+
+    <!-- МЕНЮ СОЕДИНЕНИЯ -->
+    <div class="context-menu" id="connectionMenu">
+        <div class="context-item" onclick="createNodeFromConnection('message')">
+            <span class="context-item-icon"><i data-lucide="message-circle"></i></span>
+            <span>Сообщение</span>
+        </div>
+        <div class="context-item" onclick="createNodeFromConnection('execute')">
+            <span class="context-item-icon"><i data-lucide="zap"></i></span>
+            <span>Выполнить</span>
+        </div>
+        <div class="context-item danger" onclick="cancelConnection()">
+            <span class="context-item-icon"><i data-lucide="x"></i></span>
+            <span>Отвязать</span>
+        </div>
+        <button class="context-cancel" onclick="hideConnectionMenu()">Отмена</button>
+    </div>
+
+    <!-- МОДАЛЬНОЕ ОКНО РЕДАКТОРА КНОПКИ -->
+    <div class="modal-overlay" id="buttonEditorModal">
+        <div class="modal-content">
+            <div class="modal-title">Редактор кнопки</div>
+            <div class="modal-field">
+                <label class="modal-label">Текст</label>
+                <input type="text" class="modal-input" id="buttonEditText" placeholder="Кнопка">
+            </div>
+            <div class="modal-field">
+                <label class="modal-label">Тип кнопки</label>
+                <select class="modal-select" id="buttonEditType">
+                    <option value="normal">Обычная</option>
+                    <option value="link">Ссылка</option>
+                </select>
+            </div>
+            <div class="modal-field">
+                <label class="modal-label">Цвет</label>
+                <div class="color-options" id="buttonColorOptions">
+                    <div class="color-option" data-color="#e4e6eb" style="background: #e4e6eb; border: 1px solid #ccc;"></div>
+                    <div class="color-option" data-color="#10b981" style="background: #10b981;"></div>
+                    <div class="color-option" data-color="#ef4444" style="background: #ef4444;"></div>
+                    <div class="color-option" data-color="#3b82f6" style="background: #3b82f6;"></div>
+                </div>
+            </div>
+            <div class="modal-field">
+                <label class="modal-label">Шаг после нажатия кнопки</label>
+                <div class="step-grid">
+                    <div class="step-option" data-step="message"><div class="step-option-icon"><i data-lucide="message-circle"></i></div>Сообщение</div>
+                    <div class="step-option" data-step="action"><div class="step-option-icon"><i data-lucide="zap"></i></div>Действие</div>
+                    <div class="step-option" data-step="condition"><div class="step-option-icon"><i data-lucide="git-branch"></i></div>Условие</div>
+                    <div class="step-option" data-step="timer"><div class="step-option-icon"><i data-lucide="clock"></i></div>Таймер</div>
+                    <div class="step-option" data-step="launch"><div class="step-option-icon"><i data-lucide="rocket"></i></div>Запуск сценария</div>
+                    <div class="step-option" data-step="random"><div class="step-option-icon"><i data-lucide="dice-5"></i></div>Рандом</div>
+                </div>
+            </div>
+            <div class="modal-actions">
+                <button class="btn-cancel" onclick="deleteCurrentButton()">Удалить</button>
+                <button class="btn-save-modal" onclick="saveButtonEditor()">Готово</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- МОДАЛЬНОЕ ОКНО ПЕРЕМЕННЫХ -->
+    <div class="variables-modal" id="variablesModal">
+        <div class="variables-header">
+            <div class="variables-title">
+                <i data-lucide="braces"></i>
+                <span>Переменные</span>
+            </div>
+            <button class="variables-close" onclick="closeVariablesModal()">
+                <i data-lucide="x"></i>
+            </button>
+        </div>
+        <div class="variables-content">
+            <div class="variables-sidebar">
+                <div class="variables-sidebar-title">Категории</div>
+                <div class="variables-sidebar-item active" onclick="switchVariableTab('user')" id="tabUser">
+                    <span>Пользовательские</span>
+                    <span class="variables-sidebar-count" id="countUser">0</span>
+                </div>
+                <div class="variables-sidebar-item" onclick="switchVariableTab('project')" id="tabProject">
+                    <span>Проектные</span>
+                    <span class="variables-sidebar-count" id="countProject">0</span>
+                </div>
+                <div class="variables-sidebar-item" onclick="switchVariableTab('system')" id="tabSystem">
+                    <span>Системные</span>
+                    <span class="variables-sidebar-count" id="countSystem">0</span>
+                </div>
+                <div class="variables-sidebar-item" onclick="switchVariableTab('archived')" id="tabArchived">
+                    <span>Архивированные</span>
+                    <span class="variables-sidebar-count" id="countArchived">0</span>
+                </div>
+            </div>
+            <div class="variables-main">
+                <div class="variables-toolbar">
+                    <div class="variables-search">
+                        <i data-lucide="search"></i>
+                        <input type="text" id="variablesSearch" placeholder="Название, описание переменной..." oninput="filterVariables()">
+                    </div>
+                    <button class="btn-create-variable" onclick="showVariableForm()">
+                        <i data-lucide="plus"></i>
+                        <span>Создать</span>
+                    </button>
+                </div>
+                <div class="variables-info">
+                    <div class="variables-info-title">
+                        <i data-lucide="pencil"></i>
+                        <span>Используйте переменные</span>
+                    </div>
+                    <div class="variables-info-text">
+                        Сохраняйте в переменные ответы пользователей, считайте сумму заказа и статистику бота.
+                        <span class="variables-info-link" onclick="showVariableHelp()">Подробнее</span>
+                    </div>
+                </div>
+                <div class="success-message" id="successMessage">Переменная создана</div>
+                <div class="variables-list" id="variablesList"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- МОДАЛЬНОЕ ОКНО ФОРМЫ ПЕРЕМЕННОЙ -->
+    <div class="variable-form-modal" id="variableFormModal">
+        <div class="variable-form-title" id="variableFormTitle">Создание переменной</div>
+        <div class="variable-form-field">
+            <label class="variable-form-label">Название</label>
+            <input type="text" class="variable-form-input" id="varName" placeholder="Например: ИмяПользователя">
+        </div>
+        <div class="variable-form-field" id="varScopeField">
+            <label class="variable-form-label">Область</label>
+            <select class="variable-form-select" id="varScope" onchange="toggleVarValueField()">
+                <option value="user">Пользовательская</option>
+                <option value="project">Проектная</option>
+            </select>
+        </div>
+        <div class="variable-form-field">
+            <label class="variable-form-label">Иконка</label>
+            <input type="hidden" id="varIcon" value="user">
+            <div class="icon-picker-grid" id="iconPickerGrid"></div>
+        </div>
+        <div class="variable-form-field">
+            <label class="variable-form-label">Тип</label>
+            <select class="variable-form-select" id="varType">
+                <option value="text">Текст</option>
+                <option value="number">Число</option>
+            </select>
+        </div>
+        <div class="variable-form-field" id="varValueField" style="display: none;">
+            <label class="variable-form-label">Значение</label>
+            <input type="text" class="variable-form-input" id="varValue" placeholder="Значение переменной">
+        </div>
+        <div class="variable-form-field">
+            <label class="variable-form-label">Описание</label>
+            <input type="text" class="variable-form-input" id="varDescription" placeholder="Описание переменной">
+        </div>
+        <div class="variable-form-actions">
+            <button class="btn-secondary" onclick="hideVariableForm()">Отмена</button>
+            <button class="btn-primary" id="btnSaveVariable" onclick="saveVariable()">Создать</button>
+        </div>
+    </div>
+
+    <!-- EMOJI PICKER -->
+    <emoji-picker id="emojiPicker" class="dark" style="display: none;"></emoji-picker>
+
+    <!-- ВЫПАДАЮЩИЙ СПИСОК ПЕРЕМЕННЫХ -->
+    <div class="variables-dropdown" id="variablesDropdown">
+        <div class="variables-dropdown-header">
+            <i data-lucide="search" style="width: 12px; height: 12px;"></i>
+            <span>Используйте ↑ ↓ для навигации</span>
+        </div>
+        <div id="variablesDropdownList"></div>
+    </div>
+
+    <!-- УВЕДОМЛЕНИЯ -->
+    <div class="toast" id="toast"></div>
+
+    <!-- НИЖНЯЯ ПАНЕЛЬ -->
+    <div class="bottom-bar" id="bottomBar">
+        <button class="bottom-tool" title="Редактировать">
+            <i data-lucide="pencil"></i>
+            <span class="tooltip">Редактировать</span>
+        </button>
+        <button class="bottom-tool" title="Участники">
+            <i data-lucide="users"></i>
+            <span class="tooltip">Участники</span>
+        </button>
+        <button class="bottom-tool" title="Теги">
+            <i data-lucide="tag"></i>
+            <span class="tooltip">Теги</span>
+        </button>
+        <button class="bottom-tool" title="Переменные" onclick="openVariablesModal()">
+            <i data-lucide="braces"></i>
+            <span class="tooltip">Переменные</span>
+        </button>
+        <button class="bottom-tool" title="Настройки">
+            <i data-lucide="settings"></i>
+            <span class="tooltip">Настройки</span>
+        </button>
+    </div>
+
+    <!-- ZOOM -->
+    <div class="zoom-controls">
+        <div class="zoom-label" id="zoomLabel">100%</div>
+        <button class="zoom-btn" onclick="zoomIn()"><i data-lucide="plus"></i></button>
+    </div>
+
+    <!-- СКРИПТЫ -->
+    <script src="js/core/state.js"></script>
+    <script src="js/nodes.js"></script>
+    <script src="js/nodes-data.js"></script>
+    <script src="js/nodes-render.js"></script>
+    <script src="js/variables.js"></script>
+    <script src="js/emojis.js"></script>
+    <script src="js/canvas.js"></script>
+    <script src="js/ui.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
