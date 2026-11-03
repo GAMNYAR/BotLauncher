@@ -1,32 +1,33 @@
-﻿// ========================================
+// ========================================
 // variables.js — Управление переменными (PRO, ИСПРАВЛЕННЫЙ)
+//
+// ✅ ЕДИНОЕ ХРАНИЛИЩЕ: window.variables — СТРОГО МАССИВ объектов.
+//    Каждый объект: { id, name, type, scope: 'user'|'project'|'system',
+//                     description, icon, color, ... }
+//    Раньше здесь был объект { user: [], project: [] }, а в ui.js ожидался
+//    массив — из-за этого выпадающий список переменных не работал.
+//    Дублирующиеся dropdown-функции (toggleVariablesDropdown,
+//    closeVariablesDropdown, renderVariablesDropdownList,
+//    insertVariableAtCursor, handleVariablesDropdownKeydown) УДАЛЕНЫ —
+//    они живут только в js/ui.js.
 // ========================================
 
-// Гарантируем, что глобальный объект переменных существует
-window.variables = window.variables || { user: [], project: [], archived: [], system: [] };
+// Гарантируем, что глобальное хранилище переменных существует и является массивом
+window.variables = Array.isArray(window.variables) ? window.variables : [];
 
+// Состояние dropdown переменных (используется функциями из js/ui.js)
 if (typeof window.variablesDropdownState === 'undefined') {
     window.variablesDropdownState = {
         isOpen: false,
+        textarea: null,
         filteredVars: [],
         selectedIndex: 0,
         searchQuery: '',
-        range: null
+        startCursorPos: 0,
+        range: null,
+        variables: []
     };
 }
-
-// ✅ ПРОФЕССИОНАЛЬНОЕ ОТСЛЕЖИВАНИЕ КУРСОРА
-let lastEditorRange = null;
-
-document.addEventListener('selectionchange', () => {
-    const editor = document.getElementById('messageEditor');
-    if (editor && document.activeElement === editor) {
-        const sel = window.getSelection();
-        if (sel.rangeCount > 0) {
-            lastEditorRange = sel.getRangeAt(0).cloneRange();
-        }
-    }
-});
 
 // Константы цветов и иконок
 const VAR_COLORS = {
@@ -40,6 +41,62 @@ const DEFAULT_ICONS = {
     project: 'briefcase',
     system: 'settings'
 };
+
+// ✅ Единый доступ к хранилищу переменных: window.variables — всегда массив.
+function getVariablesArray() {
+    if (!Array.isArray(window.variables)) window.variables = [];
+    return window.variables;
+}
+
+// Все переменные указанного scope ('user' | 'project' | 'system' | 'archived')
+function getVarsByScope(scope) {
+    return getVariablesArray().filter(v => v.scope === scope);
+}
+
+function findVarById(id) {
+    return getVariablesArray().find(v => v.id === id);
+}
+
+// ✅ ОТСЛЕЖИВАНИЕ КУРСОРА в contenteditable-редакторе.
+// Сохраняем Range перед открытием dropdown: при focus() на кнопке
+// браузер теряет выделение в редакторе, и без этого снапшота чип
+// переменной вставлялся бы не туда.
+let lastEditorRange = null;
+
+document.addEventListener('selectionchange', () => {
+    const editor = document.getElementById('messageEditor');
+    if (editor && document.activeElement === editor) {
+        const sel = window.getSelection();
+        if (sel.rangeCount > 0) {
+            lastEditorRange = sel.getRangeAt(0).cloneRange();
+        }
+    }
+});
+
+// ✅ СИСТЕМНЫЕ ПЕРЕМЕННЫЕ TELEGRAM
+const DEFAULT_SYSTEM_VARIABLES = [
+    { id: 'sys_1', name: 'Имя', icon: 'user', format: '{Имя}', description: 'Имя пользователя Telegram', editable: false, tokens: [], hint: '' },
+    { id: 'sys_2', name: 'Фамилия', icon: 'user', format: '{Фамилия}', description: 'Фамилия пользователя Telegram', editable: false, tokens: [], hint: '' },
+    { id: 'sys_3', name: 'Username', icon: 'at-sign', format: '{Username}', description: '@username пользователя', editable: false, tokens: [], hint: '' },
+    { id: 'sys_4', name: 'ID пользователя', icon: 'fingerprint', format: '{ID пользователя}', description: 'Уникальный ID в Telegram', editable: false, tokens: [], hint: '' },
+    { id: 'sys_5', name: 'Язык', icon: 'languages', format: '{Язык}', description: 'Язык клиента (ru, en...)', editable: false, tokens: [], hint: '' },
+    { id: 'sys_6', name: 'Номер телефона', icon: 'phone', format: '{Номер телефона}', fallback: '?', description: 'Телефон (если расшарен)', editable: true, tokens: [], hint: '' },
+    { id: 'sys_7', name: 'ID чата', icon: 'hash', format: '{ID чата}', description: 'ID текущего чата', editable: false, tokens: [], hint: '' },
+    { id: 'sys_8', name: 'Тип чата', icon: 'message-square', format: '{Тип чата}', description: 'private / group / supergroup / channel', editable: false, tokens: [], hint: '' },
+    { id: 'sys_9', name: 'ID сообщения', icon: 'mail', format: '{ID сообщения}', description: 'ID последнего сообщения', editable: false, tokens: [], hint: '' },
+    { id: 'sys_10', name: 'Текст сообщения', icon: 'message-circle', format: '{Текст сообщения}', description: 'Текст последнего сообщения', editable: false, tokens: [], hint: '' },
+    {
+        id: 'sys_11', name: 'Дата и время', icon: 'calendar', format: 'ДД.ММ.ГГГГ ЧЧ:мм', description: 'Текущие дата и время', editable: true,
+        tokens: ['ДД', 'ММ', 'ГГ', 'ГГГГ', 'ЧЧ', 'мм', 'сс', 'Год', 'Месяц', 'День', 'Час', 'Минута', 'Секунда'],
+        hint: 'Используйте токены: <code>ДД</code> — день, <code>ММ</code> — месяц, <code>ГГГГ</code> — год, <code>ЧЧ</code> — час, <code>мм</code> — минута, <code>сс</code> — секунда.'
+    },
+    {
+        id: 'sys_12', name: 'День недели', icon: 'clock', format: 'ДеньНедели', description: 'Понедельник, вторник...', editable: true,
+        tokens: ['ДеньНедели', 'ДеньНеделиКратко', 'НомерДня'],
+        hint: 'Используйте токены: <code>ДеньНедели</code> — полное название (Понедельник), <code>ДеньНеделиКратко</code> — сокращённое (Пн), <code>НомерДня</code> — номер (1-7, где 1=Пн).'
+    },
+    { id: 'sys_13', name: 'Username бота', icon: 'bot', format: '{Username бота}', description: 'Username твоего бота', editable: false, tokens: [], hint: '' }
+];
 
 // ✅ ФУНКЦИЯ СОХРАНЕНИЯ В LOCALSTORAGE (КРИТИЧЕСКИ ВАЖНО)
 function saveVariablesToStorage() {
@@ -77,67 +134,59 @@ const AVAILABLE_ICONS = [
 const DEFAULT_USER_NAMES = ['ИмяПользователя', 'НомерТелефона', 'Email', 'Город', 'ДатаРегистрации', 'КоличествоПокупок', 'СуммаЗаказа', 'СтатусКлиента', 'Промокод', 'РеферальныйКод'];
 const DEFAULT_PROJECT_NAMES = ['НазваниеКомпании', 'АдресСайта', 'ТелефонПоддержки', 'EmailПоддержки', 'ЧасыРаботы', 'АдресОфиса', 'НазваниеБота', 'ВерсияБота', 'КурсВалюты', 'СкидкаПоУмолчанию'];
 
-// ✅ СИСТЕМНЫЕ ПЕРЕМЕННЫЕ TELEGRAM
-const DEFAULT_SYSTEM_VARIABLES = [
-    { id: 'sys_1', name: 'Имя', icon: 'user', format: '{Имя}', description: 'Имя пользователя Telegram', editable: false, tokens: [], hint: '' },
-    { id: 'sys_2', name: 'Фамилия', icon: 'user', format: '{Фамилия}', description: 'Фамилия пользователя Telegram', editable: false, tokens: [], hint: '' },
-    { id: 'sys_3', name: 'Username', icon: 'at-sign', format: '{Username}', description: '@username пользователя', editable: false, tokens: [], hint: '' },
-    { id: 'sys_4', name: 'ID пользователя', icon: 'fingerprint', format: '{ID пользователя}', description: 'Уникальный ID в Telegram', editable: false, tokens: [], hint: '' },
-    { id: 'sys_5', name: 'Язык', icon: 'languages', format: '{Язык}', description: 'Язык клиента (ru, en...)', editable: false, tokens: [], hint: '' },
-    { id: 'sys_6', name: 'Номер телефона', icon: 'phone', format: '{Номер телефона}', fallback: '?', description: 'Телефон (если расшарен)', editable: true, tokens: [], hint: '' },
-    { id: 'sys_7', name: 'ID чата', icon: 'hash', format: '{ID чата}', description: 'ID текущего чата', editable: false, tokens: [], hint: '' },
-    { id: 'sys_8', name: 'Тип чата', icon: 'message-square', format: '{Тип чата}', description: 'private / group / supergroup / channel', editable: false, tokens: [], hint: '' },
-    { id: 'sys_9', name: 'ID сообщения', icon: 'mail', format: '{ID сообщения}', description: 'ID последнего сообщения', editable: false, tokens: [], hint: '' },
-    { id: 'sys_10', name: 'Текст сообщения', icon: 'message-circle', format: '{Текст сообщения}', description: 'Текст последнего сообщения', editable: false, tokens: [], hint: '' },
-    {
-        id: 'sys_11', name: 'Дата и время', icon: 'calendar', format: 'ДД.ММ.ГГГГ ЧЧ:мм', description: 'Текущие дата и время', editable: true,
-        tokens: ['ДД', 'ММ', 'ГГ', 'ГГГГ', 'ЧЧ', 'мм', 'сс', 'Год', 'Месяц', 'День', 'Час', 'Минута', 'Секунда'],
-        hint: 'Используйте токены: <code>ДД</code> — день, <code>ММ</code> — месяц, <code>ГГГГ</code> — год, <code>ЧЧ</code> — час, <code>мм</code> — минута, <code>сс</code> — секунда.'
-    },
-    {
-        id: 'sys_12', name: 'День недели', icon: 'clock', format: 'ДеньНедели', description: 'Понедельник, вторник...', editable: true,
-        tokens: ['ДеньНедели', 'ДеньНеделиКратко', 'НомерДня'],
-        hint: 'Используйте токены: <code>ДеньНедели</code> — полное название (Понедельник), <code>ДеньНеделиКратко</code> — сокращённое (Пн), <code>НомерДня</code> — номер (1-7, где 1=Пн).'
-    },
-    { id: 'sys_13', name: 'Username бота', icon: 'bot', format: '{Username бота}', description: 'Username твоего бота', editable: false, tokens: [], hint: '' }
-];
+
 
 function initVariables() {
-    // ✅ ЗАГРУЗКА ИЗ LOCALSTORAGE
-    const saved = localStorage.getItem('bot_variables');
-    if (saved) {
-        try {
-            const parsed = JSON.parse(saved);
-            window.variables.user = parsed.user || [];
-            window.variables.project = parsed.project || [];
-            window.variables.archived = parsed.archived || [];
-            // Системные переменные всегда берем из дефолтных, чтобы не терять обновления структуры
-            window.variables.system = JSON.parse(JSON.stringify(DEFAULT_SYSTEM_VARIABLES));
-        } catch (e) {
-            console.error("Ошибка парсинга переменных:", e);
-            resetVariables();
-        }
-    } else {
-        resetVariables();
+    // ✅ ЗАГРУЗКА ИЗ LOCALSTORAGE (формат: плоский массив переменных)
+    let loaded = null;
+    try {
+        const saved = localStorage.getItem('bot_variables');
+        if (saved) loaded = JSON.parse(saved);
+    } catch (e) {
+        console.error('Ошибка парсинга переменных:', e);
     }
 
+    if (Array.isArray(loaded)) {
+        window.variables = loaded;
+    } else if (loaded && typeof loaded === 'object') {
+        // ✅ Миграция из старого формата { user: [], project: [], archived: [] }
+        const flat = [];
+        for (const scope of ['user', 'project', 'archived']) {
+            (Array.isArray(loaded[scope]) ? loaded[scope] : []).forEach(v => {
+                v.scope = v.scope || scope;
+                flat.push(v);
+            });
+        }
+        window.variables = flat;
+    } else {
+        window.variables = [];
+    }
+
+    // Системные переменные всегда берём из дефолтных, чтобы не терять обновления структуры
+    DEFAULT_SYSTEM_VARIABLES.forEach(sys => {
+        const existing = window.variables.find(v => v.id === sys.id);
+        if (existing) {
+            // сохраняем пользовательские настройки формата, обновляем метаданные
+            Object.assign(existing, JSON.parse(JSON.stringify(sys)), {
+                format: existing.format !== undefined ? existing.format : sys.format,
+                fallback: existing.fallback !== undefined ? existing.fallback : sys.fallback
+            });
+        } else {
+            window.variables.push(JSON.parse(JSON.stringify(sys)));
+        }
+    });
+
     // Гарантируем метаданные для системных переменных
-    window.variables.system.forEach(v => {
+    getVarsByScope('system').forEach(v => {
         v.scope = 'system';
-        v.type = 'text';
+        v.type = v.type || 'text';
         v.isSystem = true;
         v.color = VAR_COLORS.system;
     });
 
+    saveVariablesToStorage();
     renderVariablesList();
     updateCounts();
-}
-
-function resetVariables() {
-    window.variables.user = [];
-    window.variables.project = [];
-    window.variables.archived = [];
-    window.variables.system = JSON.parse(JSON.stringify(DEFAULT_SYSTEM_VARIABLES));
 }
 
 function updateCounts() {
@@ -146,10 +195,10 @@ function updateCounts() {
     const countArchived = document.getElementById('countArchived');
     const countSystem = document.getElementById('countSystem');
 
-    if (countUser) countUser.textContent = window.variables.user.length;
-    if (countProject) countProject.textContent = window.variables.project.length;
-    if (countArchived) countArchived.textContent = window.variables.archived.length;
-    if (countSystem) countSystem.textContent = window.variables.system.length;
+    if (countUser) countUser.textContent = getVarsByScope('user').length;
+    if (countProject) countProject.textContent = getVarsByScope('project').length;
+    if (countArchived) countArchived.textContent = getVarsByScope('archived').length;
+    if (countSystem) countSystem.textContent = getVarsByScope('system').length;
 }
 
 function openVariablesModal() {
@@ -192,7 +241,7 @@ function renderVariablesList() {
     const searchTerm = searchInput ? searchInput.value.toLowerCase() : '';
     const tab = window.currentVariableTab || 'user';
 
-    let filteredVars = window.variables[tab].filter(v =>
+    let filteredVars = getVarsByScope(tab).filter(v =>
         v.name.toLowerCase().includes(searchTerm) ||
         (v.description && v.description.toLowerCase().includes(searchTerm))
     );
@@ -290,7 +339,7 @@ function showVariableForm(editId = null) {
     }
 
     if (editId) {
-        const variable = [...window.variables.user, ...window.variables.project, ...window.variables.archived].find(v => v.id === editId);
+        const variable = getVariablesArray().find(v => v.id === editId && v.scope !== 'system');
         if (!variable) return;
         title.textContent = 'Редактирование переменной';
         btnSave.textContent = 'Сохранить';
@@ -376,7 +425,7 @@ function saveVariable() {
         return;
     }
 
-    const allVars = [...window.variables.user, ...window.variables.project];
+    const allVars = getVarsByScope('user').concat(getVarsByScope('project'));
     const existingVar = allVars.find(v => v.name.toLowerCase() === name.toLowerCase() && v.id !== window.editingVariableId);
     if (existingVar) {
         if (typeof showToast === 'function') showToast('Переменная с таким названием уже существует');
@@ -386,19 +435,18 @@ function saveVariable() {
     const color = VAR_COLORS[tab];
 
     if (window.editingVariableId) {
-        const varArray = window.variables[tab];
-        const index = varArray.findIndex(v => v.id === window.editingVariableId);
-        if (index !== -1) {
-            varArray[index] = {
-                ...varArray[index],
+        const target = findVarById(window.editingVariableId);
+        if (target) {
+            Object.assign(target, {
                 name, type, scope: tab, description, icon, color,
                 value: tab === 'project' ? value : undefined
-            };
+            });
         }
         if (typeof showToast === 'function') showToast('Переменная обновлена', true);
     } else {
-        const maxId = Math.max(0, ...window.variables.user.map(v => v.id || 0), ...window.variables.project.map(v => v.id || 0), ...window.variables.archived.map(v => v.id || 0));
-        window.variables[tab].push({
+        // ✅ Новая переменная пушится именно в window.variables (массив) и сохраняется
+        const maxId = getVariablesArray().reduce((m, v) => Math.max(m, Number(v.id) || 0), 0);
+        getVariablesArray().push({
             id: maxId + 1, name, type, scope: tab, description, icon, color,
             value: tab === 'project' ? value : undefined
         });
@@ -423,13 +471,10 @@ function editVariable(id) { showVariableForm(id); }
 
 function archiveVariable(id) {
     if (!confirm('Переместить переменную в архив?')) return;
-    for (const tab of ['user', 'project']) {
-        const index = window.variables[tab].findIndex(v => v.id === id);
-        if (index !== -1) {
-            const [variable] = window.variables[tab].splice(index, 1);
-            window.variables.archived.push(variable);
-            break;
-        }
+    const variable = findVarById(id);
+    if (variable && (variable.scope === 'user' || variable.scope === 'project')) {
+        variable.previousScope = variable.scope;
+        variable.scope = 'archived';
     }
     saveVariablesToStorage();
     renderVariablesList();
@@ -438,10 +483,9 @@ function archiveVariable(id) {
 }
 
 function restoreVariable(id) {
-    const index = window.variables.archived.findIndex(v => v.id === id);
-    if (index === -1) return;
-    const [variable] = window.variables.archived.splice(index, 1);
-    window.variables[variable.scope].push(variable);
+    const variable = findVarById(id);
+    if (!variable || variable.scope !== 'archived') return;
+    variable.scope = variable.previousScope || 'user';
     saveVariablesToStorage();
     renderVariablesList();
     updateCounts();
@@ -450,9 +494,9 @@ function restoreVariable(id) {
 
 function deleteVariable(id) {
     if (!confirm('Удалить переменную навсегда? Это действие нельзя отменить.')) return;
-    const index = window.variables.archived.findIndex(v => v.id === id);
+    const index = getVariablesArray().findIndex(v => v.id === id && v.scope === 'archived');
     if (index !== -1) {
-        window.variables.archived.splice(index, 1);
+        getVariablesArray().splice(index, 1);
         saveVariablesToStorage();
         renderVariablesList();
         updateCounts();
@@ -461,13 +505,15 @@ function deleteVariable(id) {
 }
 
 function findVariableInfo(varName) {
-    const userVar = window.variables.user.find(v => v.name === varName);
+    const vars = getVariablesArray();
+
+    const userVar = vars.find(v => v.name === varName && v.scope === 'user');
     if (userVar) return { scope: 'user', color: VAR_COLORS.user, editable: false };
 
-    const projectVar = window.variables.project.find(v => v.name === varName);
+    const projectVar = vars.find(v => v.name === varName && v.scope === 'project');
     if (projectVar) return { scope: 'project', color: VAR_COLORS.project, editable: false };
 
-    const sysVar = window.variables.system.find(v => v.name === varName);
+    const sysVar = vars.find(v => v.name === varName && v.scope === 'system');
     if (sysVar) return { scope: 'system', color: VAR_COLORS.system, editable: sysVar.editable, sysVarId: sysVar.id };
 
     return { scope: 'user', color: VAR_COLORS.user, editable: false };
@@ -533,7 +579,7 @@ function updateSystemVarPreview(variable) {
 }
 
 function showSystemVarSettings(sysVarId) {
-    const variable = window.variables.system.find(v => v.id === sysVarId);
+    const variable = findVarById(sysVarId);
     if (!variable) return;
 
     let modal = document.getElementById('systemVarSettingsModal');
@@ -651,7 +697,7 @@ function insertFormatToken(token) {
     const modal = document.getElementById('systemVarSettingsModal');
     const sysVarId = modal ? modal.dataset.currentSysVarId : null;
     if (sysVarId) {
-        const variable = window.variables.system.find(v => v.id === sysVarId);
+        const variable = findVarById(sysVarId);
         if (variable) updateSystemVarPreview(variable);
     }
 }
@@ -661,7 +707,7 @@ function saveSystemVarSettings() {
     if (!modal) return;
 
     const sysVarId = modal.dataset.currentSysVarId;
-    const variable = window.variables.system.find(v => v.id === sysVarId);
+    const variable = findVarById(sysVarId);
 
     if (!variable) return;
 
@@ -679,211 +725,20 @@ function saveSystemVarSettings() {
     if (typeof showToast === 'function') showToast('Настройки системной переменной сохранены', true);
 }
 
-// ========================================
-// ✅ АБСОЛЮТНО НАДЕЖНЫЙ DROPDOWN ПЕРЕМЕННЫХ
-// ========================================
-
-// Глобальный слушатель для закрытия при клике ВНЕ dropdown
-document.addEventListener('click', function (e) {
-    const dropdown = document.getElementById('variablesDropdown');
-    if (!dropdown || !dropdown.classList.contains('show')) return;
-
-    const openBtn = document.querySelector('.toolbar-icon[title="Переменные"]');
-    if (dropdown.contains(e.target) || (openBtn && openBtn.contains(e.target))) {
-        return;
-    }
-    hideVariablesDropdown();
-});
-
-function toggleVariablesDropdown(e) {
-    if (e) {
-        e.stopPropagation();
-        e.preventDefault();
-    }
-
-    const editor = document.getElementById('messageEditor');
-    const dropdown = document.getElementById('variablesDropdown');
-
-    if (!editor) {
-        if (typeof showToast === 'function') showToast('Сначала выберите ноду для редактирования');
-        return;
-    }
-
-    if (dropdown.classList.contains('show')) {
-        hideVariablesDropdown();
-        return;
-    }
-
-    editor.focus();
-    const sel = window.getSelection();
-    if (sel.rangeCount > 0) {
-        lastEditorRange = sel.getRangeAt(0).cloneRange();
-    }
-
-    // ✅ ИСПРАВЛЕННАЯ СОРТИРОВКА:
-    // 1. Отделяем пользовательские/проектные от системных
-    const customVars = [...window.variables.user, ...window.variables.project].filter(v => v.scope !== 'system');
-    const sysVars = window.variables.system.filter(v => v.scope === 'system');
-
-    // 2. Сортируем каждую группу по алфавиту
-    customVars.sort((a, b) => a.name.localeCompare(b.name));
-    sysVars.sort((a, b) => a.name.localeCompare(b.name));
-
-    // 3. Объединяем: сначала кастомные, потом системные
-    const allVars = [...customVars, ...sysVars];
-    const list = document.getElementById('variablesDropdownList');
-
-    if (allVars.length === 0) {
-        list.innerHTML = '<div class="variables-dropdown-empty">Нет доступных переменных</div>';
-    } else {
-        list.innerHTML = allVars.map((v, i) => {
-            const color = v.scope === 'system' ? VAR_COLORS.system : (v.color || VAR_COLORS[v.scope]);
-            const icon = v.icon || DEFAULT_ICONS[v.scope] || 'braces';
-            const scopeLabel = v.scope === 'system' ? 'системная' : (v.scope === 'project' ? 'проектная' : 'пользовательская');
-
-            return `
-            <div class="variables-dropdown-item" data-index="${i}" onclick="insertVariableFromDropdown('${v.name}', '${v.scope}', event)">
-                <div class="variables-dropdown-item-left" style="display: flex; align-items: center; gap: 10px; width: 100%;">
-                    <div style="width: 28px; height: 28px; border-radius: 50%; background: ${color}; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
-                        <i data-lucide="${icon}" style="width: 14px; height: 14px; color: white;"></i>
-                    </div>
-                    <div style="display: flex; flex-direction: column; flex: 1; min-width: 0;">
-                        <div style="display: flex; align-items: center; gap: 6px;">
-                            <span class="variables-dropdown-item-name" style="color: #e0e7ff; font-weight: 600; font-size: 13px;">{${v.name}}</span>
-                            <span style="font-size: 10px; color: #6b7280; background: rgba(107, 114, 128, 0.2); padding: 1px 4px; border-radius: 3px; white-space: nowrap;">${v.type === 'number' ? 'Число' : 'Текст'}</span>
-                        </div>
-                        ${v.description ? `<span style="font-size: 11px; color: #6b7280;">${v.description}</span>` : ''}
-                    </div>
-                </div>
-            </div>
-        `}).join('');
-    }
-
-    const editorRect = editor.getBoundingClientRect();
-    dropdown.style.position = 'fixed';
-    dropdown.style.top = (editorRect.bottom + 8) + 'px';
-    dropdown.style.left = editorRect.left + 'px';
-    dropdown.style.width = editorRect.width + 'px';
-    dropdown.style.zIndex = '9999';
-    dropdown.style.maxHeight = '250px';
-    dropdown.style.overflowY = 'auto';
-
-    dropdown.classList.add('show');
-    window.variablesDropdownState.isOpen = true;
-
-    if (typeof lucide !== 'undefined') lucide.createIcons();
-}
-
-function hideVariablesDropdown() {
-    const dropdown = document.getElementById('variablesDropdown');
-    if (dropdown) {
-        dropdown.classList.remove('show');
-        dropdown.style.display = '';
-        dropdown.style.position = '';
-        dropdown.style.top = '';
-        dropdown.style.left = '';
-        dropdown.style.width = '';
-        dropdown.style.zIndex = '';
-        dropdown.style.maxHeight = '';
-        dropdown.style.overflowY = '';
-    }
-    window.variablesDropdownState.isOpen = false;
-    window.variablesDropdownState.textarea = null;
-    window.variablesDropdownState.filteredVars = [];
-    window.variablesDropdownState.selectedIndex = 0;
-    window.variablesDropdownState.searchQuery = '';
-}
-
-function insertVariableFromDropdown(varName, scope = 'user', e) {
-    if (e) {
-        e.stopPropagation();
-        e.preventDefault();
-    }
-
-    const editor = document.getElementById('messageEditor');
-    if (!editor) return;
-
-    // ✅ Получаем точную информацию о переменной для правильного цвета
-    const varInfo = findVariableInfo(varName);
-    const finalScope = varInfo.scope || scope;
-    const color = varInfo.color || VAR_COLORS[finalScope] || VAR_COLORS.user;
-
-    const chip = document.createElement('span');
-    chip.className = 'variable-chip';
-    chip.contentEditable = 'false';
-    chip.dataset.variable = varName;
-    chip.dataset.scope = finalScope;
-    chip.textContent = varName; // Без скобок визуально
-
-    chip.style.background = `${color}35`;
-    chip.style.borderColor = `${color}80`;
-    chip.style.color = color;
-    chip.style.border = '1px solid';
-    chip.style.borderRadius = '4px';
-    chip.style.padding = '2px 6px';
-    chip.style.margin = '0 2px';
-    chip.style.fontSize = '12px';
-    chip.style.fontWeight = '600';
-    chip.style.display = 'inline-block';
-
-    if (varInfo.scope === 'system' && varInfo.editable) {
-        chip.dataset.editable = 'true';
-        chip.dataset.sysvarid = varInfo.sysVarId;
-    }
-
-    const selection = window.getSelection();
-    let range;
-
-    if (lastEditorRange && editor.contains(lastEditorRange.commonAncestorContainer)) {
-        range = lastEditorRange;
-    } else if (selection.rangeCount > 0 && editor.contains(selection.getRangeAt(0).commonAncestorContainer)) {
-        range = selection.getRangeAt(0);
-    } else {
-        range = document.createRange();
-        range.selectNodeContents(editor);
-        range.collapse(false);
-    }
-
-    range.deleteContents();
-    range.insertNode(chip);
-
-    const zwsp = document.createTextNode('\u200B');
-    range.setStartAfter(chip);
-    range.setEndAfter(chip);
-    range.insertNode(zwsp);
-
-    lastEditorRange = document.createRange();
-    lastEditorRange.setStartAfter(zwsp);
-    lastEditorRange.setEndAfter(zwsp);
-
-    selection.removeAllRanges();
-    selection.addRange(lastEditorRange);
-
-    if (typeof selectedNode !== 'undefined' && selectedNode) {
-        selectedNode.message = getEditorText(editor);
-        if (typeof markUnsaved === 'function') markUnsaved();
-    }
-
-    hideVariablesDropdown();
-    editor.focus();
-}
-
-function handleVariablesDropdownKeydown(e, editor) {
-    if (!window.variablesDropdownState.isOpen) return;
-    if (e.key === 'Escape') {
-        hideVariablesDropdown();
-        if (editor) editor.focus();
-    }
-}
-
 function showVariableHelp() {
     if (typeof showToast === 'function') showToast('Переменные позволяют сохранять данные пользователей');
 }
 
-// ✅ Экспорт всех функций глобально
-window.toggleVariablesDropdown = toggleVariablesDropdown;
-window.hideVariablesDropdown = hideVariablesDropdown;
-window.insertVariableFromDropdown = insertVariableFromDropdown;
+// ✅ Экспорт функций глобально
+// (dropdown-функции экспортируются из js/ui.js — там они единственные)
+window.getVariablesArray = getVariablesArray;
+window.getVarsByScope = getVarsByScope;
+window.findVarById = findVarById;
+window.findVariableInfo = findVariableInfo;
+window.saveVariablesToStorage = saveVariablesToStorage;
+window.initVariables = initVariables;
+window.renderVariablesList = renderVariablesList;
+window.updateCounts = updateCounts;
 window.openVariablesModal = openVariablesModal;
 window.closeVariablesModal = closeVariablesModal;
 window.switchVariableTab = switchVariableTab;

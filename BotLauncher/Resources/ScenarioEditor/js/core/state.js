@@ -12,13 +12,19 @@
 //      Это «мост»: запись nodes = [] автоматически обновляет window.state.nodes.
 // ========================================
 
+// ⚠️ ВАЖНО: window.variables — строго МАССИВ объектов [{id, name, scope, type, ...}, ...].
+// Раньше он был объектом { user: [], project: [] } — из-за этого выпадающий список
+// переменных в ui.js не работал. Единое хранилище — только массив.
+window.variables = Array.isArray(window.variables) ? window.variables : [];
+
 (function initEditorState() {
     // Сам объект-хранилище. Все важные данные холста — здесь.
     window.state = {
         nodes: [],                          // список всех нод на холсте
         connections: [],                    // связи между нодами
         selectedNode: null,                 // какая нода сейчас выбрана (или null)
-        camera: { x: 0, y: 0, zoom: 1 }     // положение и масштаб камеры
+        camera: { x: 0, y: 0, zoom: 1 },    // положение и масштаб камеры
+        variables: window.variables         // единое хранилище переменных (массив)
     };
 
     /**
@@ -44,4 +50,7 @@
     linkGlobalAlias('connections');
     linkGlobalAlias('selectedNode');
     linkGlobalAlias('camera');
+
+    // window.variables — остаётся отдельной глобальной переменной (массивом),
+    // как и раньше. Никаких let-конфликтов в других файлах быть не должно.
 })();
