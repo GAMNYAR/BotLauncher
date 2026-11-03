@@ -4,9 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Редактор сценариев</title>
-    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- ✅ ЛОКАЛЬНЫЕ БИБЛИОТЕКИ (offline-режим, без CDN) -->
+    <script src="js/libs/lucide.min.js"></script>
     <script type="module">
-        import 'https://cdn.jsdelivr.net/npm/emoji-picker-element@1.22.8/index.js';
+        // emoji-picker-element — локальный ESM-бандл вместо jsdelivr CDN
+        import './js/libs/emoji-esm.js';
     </script>
     <link rel="stylesheet" href="css/variables.css">
     <link rel="stylesheet" href="css/main.css">

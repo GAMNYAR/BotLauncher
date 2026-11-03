@@ -795,11 +795,14 @@ function toggleVariablesDropdown() {
         ? window.variables
         : defaultVariables;
 
-    window.variablesDropdownState.variables = vars;
+    // ✅ Фильтр: не показываем в dropdown архивные переменные
+    const visibleVars = vars.filter(v => v.scope !== 'archived');
+
+    window.variablesDropdownState.variables = visibleVars;
     window.variablesDropdownState.selectedIndex = 0;
     window.variablesDropdownState.isOpen = true;
 
-    renderVariablesDropdownList(vars);
+    renderVariablesDropdownList(visibleVars);
 
     // ✅ НАДЁЖНОЕ ПОЗИЦИОНИРОВАНИЕ
     const toolbarBtn = document.querySelector('.toolbar-icon[title="Переменные"]');
