@@ -570,7 +570,7 @@ function renderMessagePreview(node, containerId = 'messagePreviewContainer') {
                 </div>
                 <div class="msg-toolbar">
                     <div class="toolbar-icons">
-                        <button class="toolbar-icon" title="Эмодзи" onclick="insertEmoji()"><i data-lucide="smile"></i></button>
+                        <button class="toolbar-icon" title="Эмодзи" onclick="openEmojiPicker()"><i data-lucide="smile"></i></button>
                         <button class="toolbar-icon" title="Переменные"><i data-lucide="braces"></i></button>
                     </div>
                     <button class="toolbar-icon" title="Вложение"><i data-lucide="paperclip"></i></button>
@@ -783,15 +783,20 @@ function toggleVariablesDropdown() {
         return;
     }
 
+    // ✅ СОХРАНЯЕМ ПОЗИЦИЮ КУРСОРА ДО ОТКРЫТИЯ DROPDOWN.
+    // При клике на кнопку {} браузер теряет выделение в редакторе,
+    // поэтому снапшот Range делаем заранее (плюс fallback из variables.js).
     const editor = document.getElementById('messageEditor');
     if (editor) {
         const selection = window.getSelection();
-        if (selection.rangeCount > 0) {
+        if (selection.rangeCount > 0 && editor.contains(selection.getRangeAt(0).commonAncestorContainer)) {
             lastSelectionRange = selection.getRangeAt(0).cloneRange();
+        } else if (typeof lastEditorRange !== 'undefined' && lastEditorRange && editor.contains(lastEditorRange.commonAncestorContainer)) {
+            lastSelectionRange = lastEditorRange.cloneRange();
         }
     }
 
-    const vars = (window.variables && Array.isArray(window.variables))
+    const vars = (window.variables && Array.isArray(window.variables) && window.variables.length > 0)
         ? window.variables
         : defaultVariables;
 
@@ -804,28 +809,38 @@ function toggleVariablesDropdown() {
 
     renderVariablesDropdownList(visibleVars);
 
-    // ✅ НАДЁЖНОЕ ПОЗИЦИОНИРОВАНИЕ
+    // ✅ НАДЁЖНОЕ ПОЗИЦИОНИРОВАНИЕ: СПИЗУ от кнопки (отступ 4px),
+    //    если снизу экрана мало места (< 300px) — открываем СВЕРХУ.
     const toolbarBtn = document.querySelector('.toolbar-icon[title="Переменные"]');
 
     if (toolbarBtn) {
         const rect = toolbarBtn.getBoundingClientRect();
+        const spaceBelow = window.innerHeight - rect.bottom;
 
-        // Позиционируем dropdown прямо под кнопкой
         dropdown.style.cssText = `
             position: fixed;
-            left: ${rect.left}px;
-            top: ${rect.bottom + 4}px;
+            left: ${Math.max(8, Math.min(rect.left, window.innerWidth - 320))}px;
             z-index: 9999;
             display: block;
             min-width: 280px;
             max-width: 320px;
-            max-height: 400px;
+            max-height: 320px;
             overflow-y: auto;
-            background: #1e1b3a;
+            background: rgba(30, 30, 50, 0.98);
             border: 1px solid rgba(139, 92, 246, 0.3);
             border-radius: 8px;
             box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
         `;
+
+        if (spaceBelow >= 300) {
+            // Открываем СНИЗУ от кнопки с отступом 4px
+            dropdown.style.top = (rect.bottom + 4) + 'px';
+            dropdown.style.bottom = 'auto';
+        } else {
+            // Мало места снизу — открываем сверху от кнопки
+            dropdown.style.top = 'auto';
+            dropdown.style.bottom = (window.innerHeight - rect.top + 4) + 'px';
+        }
 
         dropdown.classList.add('show');
     }
@@ -919,8 +934,9 @@ function insertVariableAtCursor(varName) {
     if (!editor) return;
 
     closeVariablesDropdown();
-    editor.focus();
 
+    // ✅ ВАЖНО: Range берём ДО вызова focus(), т.к. focus() + selectionchange
+    // могут перезаписать активное выделение в редакторе.
     let varInfo = { scope: 'user' };
     if (typeof findVariableInfo === 'function') {
         varInfo = findVariableInfo(varName);
@@ -953,36 +969,63 @@ function insertVariableAtCursor(varName) {
         chip.dataset.sysvarid = varInfo.sysVarId;
     }
 
+    // Фокус на редактор — чтобы вставка произошла именно в него
+    editor.focus();
+
     const selection = window.getSelection();
     let range;
 
+    // 1) Сохранённая позиция курсора (снимок из toggleVariablesDropdown)
     if (lastSelectionRange && editor.contains(lastSelectionRange.commonAncestorContainer)) {
-        range = lastSelectionRange;
-    } else if (selection.rangeCount > 0 && editor.contains(selection.anchorNode)) {
-        range = selection.getRangeAt(0);
-    } else {
+        range = lastSelectionRange.cloneRange();
+    }
+    // 2) Актуальный снимок из отслеживания selectionchange (variables.js)
+    else if (typeof lastEditorRange !== 'undefined' && lastEditorRange && editor.contains(lastEditorRange.commonAncestorContainer)) {
+        range = lastEditorRange.cloneRange();
+    }
+    // 3) Текущее живое выделение, если оно внутри редактора
+    else if (selection.rangeCount > 0 && editor.contains(selection.getRangeAt(0).commonAncestorContainer)) {
+        range = selection.getRangeAt(0).cloneRange();
+    }
+    // 4) Fallback — в конец редактора
+    else {
         range = document.createRange();
         range.selectNodeContents(editor);
         range.collapse(false);
     }
 
+    // ✅ ВСТАВКА: deleteContents → chip → пробел → курсор после пробела.
+    // Пробел — неразрывный (\u00A0), иначе браузер схлопнет обычный пробел
+    // на границе с inline-block чипом и визуально он «исчезнет».
     range.deleteContents();
     range.insertNode(chip);
 
-    const space = document.createTextNode(' ');
-    range.insertNode(space);
+    const spaceNode = document.createTextNode('\u00A0');
+    range.setStartAfter(chip);
+    range.collapse(true);
+    range.insertNode(spaceNode);
+
+    range.setStartAfter(spaceNode);
+    range.setEndAfter(spaceNode);
     range.collapse(false);
 
     selection.removeAllRanges();
     selection.addRange(range);
-    lastSelectionRange = null;
 
+    lastSelectionRange = range.cloneRange();
+
+    // ✅ Обновляем текст ноды из редактора
     if (selectedNode) {
         selectedNode.message = getEditorText(editor);
         if (typeof markUnsaved === 'function') markUnsaved();
     }
 
-    setTimeout(() => editor.focus(), 10);
+    setTimeout(() => {
+        editor.focus();
+        const sel = window.getSelection();
+        sel.removeAllRanges();
+        sel.addRange(range);
+    }, 0);
 }
 
 function handleVariablesDropdownKeydown(e, editor) {
@@ -1447,52 +1490,58 @@ function renderExecuteActions() {
     if (!selectedNode.actions) selectedNode.actions = [];
 
     selectedNode.actions.forEach((action, index) => {
+        // ✅ Обёртка действия: свой фон + padding, поля всегда видимы
+        const block = document.createElement('div');
+        block.className = 'execute-action-block';
+        block.style.cssText = 'background: rgba(15, 15, 30, 0.4); padding: 8px; border-radius: 8px; margin-bottom: 8px; width: 100%; box-sizing: border-box;';
+
+        // ✅ Один ряд: [varInput] [=] [valueInput] [deleteBtn]
         const row = document.createElement('div');
         row.className = 'execute-action-row';
-        row.style.cssText = 'display: flex; gap: 8px; margin-bottom: 8px; align-items: center;';
+        row.style.cssText = 'display: flex; align-items: center; gap: 6px; width: 100%; box-sizing: border-box;';
 
         const varInput = document.createElement('input');
         varInput.type = 'text';
         varInput.className = 'execute-var-input';
         varInput.placeholder = 'Переменная...';
         varInput.value = action.variable || '';
-        varInput.style.cssText = 'flex: 1; padding: 8px; background: rgba(15, 15, 30, 0.6); border: 1px solid rgba(139, 92, 246, 0.3); border-radius: 6px; color: #e0e7ff; font-size: 13px;';
+        // flex:1 + min-width:0 — поле занимает всю доступную ширину и корректно сжимается
+        varInput.style.cssText = 'flex: 1; min-width: 0; padding: 8px; background: rgba(15, 15, 30, 0.6); border: 1px solid rgba(139, 92, 246, 0.3); border-radius: 6px; color: #e0e7ff; font-size: 13px; box-sizing: border-box;';
         varInput.oninput = (e) => updateExecuteAction(index, 'variable', e.target.value);
 
         const equals = document.createElement('span');
         equals.textContent = '=';
-        equals.style.cssText = 'color: #ea580c; font-weight: 600; font-size: 14px;';
+        // Фиксированная ширина, не сжимается
+        equals.style.cssText = 'color: #ea580c; font-weight: 600; font-size: 14px; flex-shrink: 0; width: 14px; text-align: center;';
 
         const valueInput = document.createElement('input');
         valueInput.type = 'text';
         valueInput.className = 'execute-value-input';
         valueInput.placeholder = 'Значение';
         valueInput.value = action.value || '';
-        valueInput.style.cssText = 'flex: 1; padding: 8px; background: rgba(15, 15, 30, 0.6); border: 1px solid rgba(139, 92, 246, 0.3); border-radius: 6px; color: #e0e7ff; font-size: 13px;';
+        valueInput.style.cssText = 'flex: 1; min-width: 0; padding: 8px; background: rgba(15, 15, 30, 0.6); border: 1px solid rgba(139, 92, 246, 0.3); border-radius: 6px; color: #e0e7ff; font-size: 13px; box-sizing: border-box;';
         valueInput.oninput = (e) => updateExecuteAction(index, 'value', e.target.value);
 
         const deleteBtn = document.createElement('button');
         deleteBtn.className = 'execute-action-delete';
+        deleteBtn.title = 'Удалить действие';
         deleteBtn.innerHTML = '<i data-lucide="trash-2" style="width: 14px; height: 14px;"></i>';
-        deleteBtn.style.cssText = 'width: 32px; height: 32px; border: none; background: rgba(239, 68, 68, 0.1); color: #ef4444; border-radius: 6px; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0;';
+        // Фиксированный размер 32x32, не сжимается
+        deleteBtn.style.cssText = 'width: 32px; height: 32px; min-width: 32px; min-height: 32px; flex-shrink: 0; border: none; background: rgba(239, 68, 68, 0.1); color: #ef4444; border-radius: 6px; cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 0; box-sizing: border-box;';
         deleteBtn.onclick = () => removeExecuteAction(index);
 
         row.appendChild(varInput);
         row.appendChild(equals);
         row.appendChild(valueInput);
         row.appendChild(deleteBtn);
-        container.appendChild(row);
+        block.appendChild(row);
+        container.appendChild(block);
     });
     if (typeof lucide !== 'undefined') lucide.createIcons();
 }
 
-function insertEmoji() {
-    if (typeof openEmojiPicker === 'function') {
-        openEmojiPicker();
-    } else {
-        if (typeof showToast === 'function') showToast('Файл emojis.js не подключён');
-    }
-}
+// ✅ В ui.js НЕ объявляем insertEmoji — реализация живёт в js/emojis.js
+// (openEmojiPicker + insertEmoji как alias), чтобы не было дублей и конфликтов.
 
 // Закрытие dropdown при клике вне его
 document.addEventListener('click', function (e) {
